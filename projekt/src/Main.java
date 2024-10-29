@@ -12,17 +12,16 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
+
     private static Map<String, String> dictionary = new HashMap<>();
     private static GUIScreen guiScreen;
 
     public static void main(String[] args) {
-        loadDictionary("dictionary.txt");
-
         Screen screen = TerminalFacade.createScreen();
         guiScreen = TerminalFacade.createGUIScreen(screen);
         guiScreen.getScreen().startScreen();
 
-        Window mainWindow = new Window("Słownik Angielsko-Polski");
+        Window mainWindow = new Window("Fiszkoteka");
         mainWindow.setWindowSizeOverride(new TerminalSize(40, 15));
         mainWindow.setSoloWindow(true);
 
@@ -30,8 +29,9 @@ public class Main {
         mainPanel.addComponent(new Button("Dodaj słówko", Main::addWord));
         mainPanel.addComponent(new Button("Wyszukaj słówko", Main::searchWord));
         mainPanel.addComponent(new Button("Nauka słówek", Main::learnWords));
-        mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionaryWithCustomName));
-        mainPanel.addComponent(new Button("Wyjście", Main::exitApplication));
+        mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
+        mainPanel.addComponent(new Button("Wczytaj słownik", Main::loadDictionary));
+        mainPanel.addComponent(new Button("Wyjście", Main::exit));
 
         mainWindow.addComponent(mainPanel);
         guiScreen.showWindow(mainWindow, GUIScreen.Position.CENTER);
@@ -129,7 +129,7 @@ public class Main {
         }
     }
 
-    private static void saveDictionaryWithCustomName() {
+    private static void saveDictionary() {
         Window saveWindow = new Window("Zapisz słownik");
         saveWindow.setWindowSizeOverride(new TerminalSize(30, 10));
 
@@ -156,6 +156,34 @@ public class Main {
         guiScreen.showWindow(saveWindow, GUIScreen.Position.CENTER);
     }
 
+    private static void loadDictionary() {
+        Window loadWindow = new Window("Wczytaj słownik");
+        loadWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+
+        Panel panel = new Panel();
+        panel.addComponent(new Label("Podaj nazwę pliku do wczytania:"));
+        TextBox fileNameInput = new TextBox();
+        panel.addComponent(fileNameInput);
+
+        panel.addComponent(new Button("Wczytaj", new Action() {
+            @Override
+            public void doAction() {
+                String fileName = fileNameInput.getText();
+                if (!fileName.isEmpty()) {
+                    dictionary.clear(); // Czyszczenie obecnego słownika
+                    loadDictionary(fileName);
+                    showMessage("Wczytano", "Słownik został wczytany z pliku: " + fileName);
+                    loadWindow.close();
+                } else {
+                    showMessage("Błąd", "Nazwa pliku nie może być pusta.");
+                }
+            }
+        }));
+
+        loadWindow.addComponent(panel);
+        guiScreen.showWindow(loadWindow, GUIScreen.Position.CENTER);
+    }
+
     private static void saveDictionary(String fileName) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             for (Map.Entry<String, String> entry : dictionary.entrySet()) {
@@ -177,12 +205,19 @@ public class Main {
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Błąd odczytu słownika.");
+                showMessage("Błąd odczytu", "Nie udało się wczytać słownika z pliku: " + fileName);
             }
+        } else {
+            showMessage("Błąd", "Plik o nazwie " + fileName + " nie istnieje.");
         }
     }
 
     private static void showMessage(String title, String message) {
+        if (guiScreen == null) {
+            System.err.println("Error: guiScreen is null, cannot display message.");
+            return;
+        }
+
         Window messageWindow = new Window(title);
         messageWindow.setWindowSizeOverride(new TerminalSize(30, 5));
 
@@ -194,7 +229,7 @@ public class Main {
         guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
     }
 
-    private static void exitApplication() {
+    private static void exit() {
         guiScreen.getScreen().stopScreen();
         System.exit(0);
     }
