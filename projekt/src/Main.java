@@ -12,13 +12,11 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
-    private static final String DICTIONARY_FILE = "dictionary.txt";
     private static Map<String, String> dictionary = new HashMap<>();
     private static GUIScreen guiScreen;
-    int zmiennadoGita;
 
     public static void main(String[] args) {
-        loadDictionary();
+        loadDictionary("dictionary.txt");
 
         Screen screen = TerminalFacade.createScreen();
         guiScreen = TerminalFacade.createGUIScreen(screen);
@@ -32,7 +30,8 @@ public class Main {
         mainPanel.addComponent(new Button("Dodaj słówko", Main::addWord));
         mainPanel.addComponent(new Button("Wyszukaj słówko", Main::searchWord));
         mainPanel.addComponent(new Button("Nauka słówek", Main::learnWords));
-        mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
+        mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionaryWithCustomName));
+        mainPanel.addComponent(new Button("Wyjście", Main::exitApplication));
 
         mainWindow.addComponent(mainPanel);
         guiScreen.showWindow(mainWindow, GUIScreen.Position.CENTER);
@@ -130,20 +129,46 @@ public class Main {
         }
     }
 
-    private static void saveDictionary() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DICTIONARY_FILE))) {
+    private static void saveDictionaryWithCustomName() {
+        Window saveWindow = new Window("Zapisz słownik");
+        saveWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+
+        Panel panel = new Panel();
+        panel.addComponent(new Label("Podaj nazwę pliku:"));
+        TextBox fileNameInput = new TextBox();
+        panel.addComponent(fileNameInput);
+
+        panel.addComponent(new Button("Zapisz", new Action() {
+            @Override
+            public void doAction() {
+                String fileName = fileNameInput.getText();
+                if (!fileName.isEmpty()) {
+                    saveDictionary(fileName);
+                    showMessage("Zapisano", "Słownik został zapisany do pliku: " + fileName);
+                    saveWindow.close();
+                } else {
+                    showMessage("Błąd", "Nazwa pliku nie może być pusta.");
+                }
+            }
+        }));
+
+        saveWindow.addComponent(panel);
+        guiScreen.showWindow(saveWindow, GUIScreen.Position.CENTER);
+    }
+
+    private static void saveDictionary(String fileName) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             for (Map.Entry<String, String> entry : dictionary.entrySet()) {
                 writer.println(entry.getKey() + "=" + entry.getValue());
             }
-            showMessage("Zapisano", "Słownik został zapisany do pliku.");
         } catch (IOException e) {
-            showMessage("Błąd zapisu", "Nie udało się zapisać słownika.");
+            showMessage("Błąd zapisu", "Nie udało się zapisać słownika do pliku: " + fileName);
         }
     }
 
-    private static void loadDictionary() {
-        if (Files.exists(Paths.get(DICTIONARY_FILE))) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(DICTIONARY_FILE))) {
+    private static void loadDictionary(String fileName) {
+        if (Files.exists(Paths.get(fileName))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] parts = line.split("=");
@@ -167,5 +192,10 @@ public class Main {
 
         messageWindow.addComponent(panel);
         guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
+    }
+
+    private static void exitApplication() {
+        guiScreen.getScreen().stopScreen();
+        System.exit(0);
     }
 }
