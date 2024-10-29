@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="lanterna-2.1.7">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../../lanterna-2.1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../lanterna-2.1.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

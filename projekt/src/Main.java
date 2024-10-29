@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
-
     private static final String DICTIONARY_FILE = "dictionary.txt";
     private static Map<String, String> dictionary = new HashMap<>();
     private static GUIScreen guiScreen;
+    int zmiennadoGita;
 
     public static void main(String[] args) {
         loadDictionary();
