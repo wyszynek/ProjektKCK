@@ -78,7 +78,7 @@ public class Main {
         searchWindow.setWindowSizeOverride(new TerminalSize(30, 10));
 
         Panel panel = new Panel();
-        panel.addComponent(new Label("Podaj słówko (ang):"));
+        panel.addComponent(new Label("Podaj słówko (ang/pol):"));
         TextBox searchInput = new TextBox();
         panel.addComponent(searchInput);
 
@@ -87,6 +87,15 @@ public class Main {
             public void doAction() {
                 String word = searchInput.getText();
                 String translation = dictionary.get(word);
+
+                if (translation == null) {
+                    for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+                        if (entry.getValue().equalsIgnoreCase(word)) {
+                            translation = entry.getKey();
+                            break;
+                        }
+                    }
+                }
 
                 if (translation != null) {
                     showMessage("Wynik wyszukiwania", "Słówko: " + word + "\nTłumaczenie: " + translation);
