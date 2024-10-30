@@ -65,6 +65,8 @@ public class Main {
             }
         }));
 
+        panel.addComponent(new Button("Anuluj", addWordWindow::close));
+
         addWordWindow.addComponent(panel);
         guiScreen.showWindow(addWordWindow, GUIScreen.Position.CENTER);
     }
@@ -92,6 +94,8 @@ public class Main {
                 searchWindow.close();
             }
         }));
+
+        panel.addComponent(new Button("Anuluj", searchWindow::close));
 
         searchWindow.addComponent(panel);
         guiScreen.showWindow(searchWindow, GUIScreen.Position.CENTER);
@@ -152,6 +156,8 @@ public class Main {
             }
         }));
 
+        panel.addComponent(new Button("Anuluj", saveWindow::close));
+
         saveWindow.addComponent(panel);
         guiScreen.showWindow(saveWindow, GUIScreen.Position.CENTER);
     }
@@ -179,6 +185,8 @@ public class Main {
                 }
             }
         }));
+
+        panel.addComponent(new Button("Anuluj", loadWindow::close));
 
         loadWindow.addComponent(panel);
         guiScreen.showWindow(loadWindow, GUIScreen.Position.CENTER);
