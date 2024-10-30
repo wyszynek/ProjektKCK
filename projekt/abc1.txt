@@ -1,0 +1,4 @@
+apple=jablko
+city=miasto
+village=wies
+home=dom

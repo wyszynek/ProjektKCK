@@ -25,6 +25,8 @@ public class Main {
         mainWindow.setWindowSizeOverride(new TerminalSize(40, 15));
         mainWindow.setSoloWindow(true);
 
+        loadDictionary("abc1.txt");
+
         Panel mainPanel = new Panel();
         mainPanel.addComponent(new Button("Dodaj słówko", Main::addWord));
         mainPanel.addComponent(new Button("Wyszukaj słówko", Main::searchWord));
@@ -102,36 +104,66 @@ public class Main {
     }
 
     private static void learnWords() {
-        List<String> words = new ArrayList<>(dictionary.keySet());
-        Collections.shuffle(words);
+        List<Map.Entry<String, String>> wordList = new ArrayList<>(dictionary.entrySet());
+        Collections.shuffle(wordList);
 
-        for (String word : words) {
-            String correctTranslation = dictionary.get(word);
-            Window learnWindow = new Window("Nauka słówek");
-            learnWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+        int[] index = {0};
+        int[] correctCount = {0};
+        int[] incorrectCount = {0};
+        int[] skippedCount  = {0};
 
-            Panel panel = new Panel();
-            panel.addComponent(new Label("Podaj tłumaczenie dla: " + word));
-            TextBox userInput = new TextBox();
-            panel.addComponent(userInput);
-
-            panel.addComponent(new Button("Sprawdź", new Action() {
-                @Override
-                public void doAction() {
-                    String userTranslation = userInput.getText();
-                    if (userTranslation.equalsIgnoreCase(correctTranslation)) {
-                        showMessage("Wynik", "Poprawnie! Tłumaczenie to: " + correctTranslation);
-                    } else {
-                        showMessage("Błąd", "Błędne tłumaczenie. Poprawne to: " + correctTranslation);
-                    }
-                    learnWindow.close();
-                }
-            }));
-
-            learnWindow.addComponent(panel);
-            guiScreen.showWindow(learnWindow, GUIScreen.Position.CENTER);
-        }
+        showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount );
     }
+
+    private static void showLearningWindow(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount ) {
+        if (index[0] >= wordList.size()) {
+            showMessage("Koniec nauki!",
+                    "Poprawne odpowiedzi: " + correctCount[0] +
+                            "\nBłędne odpowiedzi: " + incorrectCount[0] +
+                            "\nPominięte odpowiedzi: " + skippedCount[0]);
+            return;
+        }
+
+        Window learnWindow = new Window("Nauka słówek");
+        learnWindow.setWindowSizeOverride(new TerminalSize(40, 15));
+
+        Panel panel = new Panel();
+        Label wordLabel = new Label("Podaj tłumaczenie dla: " + wordList.get(index[0]).getKey());
+        TextBox answerInput = new TextBox();
+
+        panel.addComponent(wordLabel);
+        panel.addComponent(answerInput);
+
+        panel.addComponent(new Button("Sprawdź", () -> {
+            String correctAnswer = wordList.get(index[0]).getValue();
+            String userAnswer = answerInput.getText().trim();
+
+            if (userAnswer.equalsIgnoreCase(correctAnswer)) {
+                correctCount[0]++;
+                showMessage("Poprawnie", "Dobrze! Poprawna odpowiedź.");
+            } else {
+                incorrectCount[0]++;
+                showMessage("Niepoprawnie", "Źle. Poprawna odpowiedź: " + correctAnswer);
+            }
+
+            index[0]++;
+            learnWindow.close();
+            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount);
+        }));
+
+        panel.addComponent(new Button("Anuluj", learnWindow::close));
+
+        panel.addComponent(new Button("Pomiń", () -> {
+            skippedCount[0]++;
+            index[0]++;
+            learnWindow.close();
+            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount);
+        }));
+
+        learnWindow.addComponent(panel);
+        guiScreen.showWindow(learnWindow, GUIScreen.Position.CENTER);
+    }
+
 
     private static void saveDictionary() {
         Window saveWindow = new Window("Zapisz słownik");
@@ -227,7 +259,7 @@ public class Main {
         }
 
         Window messageWindow = new Window(title);
-        messageWindow.setWindowSizeOverride(new TerminalSize(30, 5));
+        messageWindow.setWindowSizeOverride(new TerminalSize(30, 6));
 
         Panel panel = new Panel();
         panel.addComponent(new Label(message));
