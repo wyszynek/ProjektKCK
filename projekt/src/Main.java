@@ -1,5 +1,4 @@
 import com.googlecode.lanterna.TerminalFacade;
-import com.googlecode.lanterna.gui.Action;
 import com.googlecode.lanterna.gui.GUIScreen;
 import com.googlecode.lanterna.gui.Window;
 import com.googlecode.lanterna.gui.component.*;
@@ -7,14 +6,12 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
-
     private static Map<String, String> dictionary = new HashMap<>();
     private static GUIScreen guiScreen;
+    private static Panel mainPanel;
 
     public static void main(String[] args) {
         Screen screen = TerminalFacade.createScreen();
@@ -25,61 +22,61 @@ public class Main {
         mainWindow.setWindowSizeOverride(new TerminalSize(40, 15));
         mainWindow.setSoloWindow(true);
 
-        //loadDictionary("abc1.txt");
-
-        Panel mainPanel = new Panel();
-        mainPanel.addComponent(new Button("Dodaj słówko", Main::addWord));
-        mainPanel.addComponent(new Button("Wyszukaj słówko", Main::searchWord));
-        mainPanel.addComponent(new Button("Nauka słówek", Main::learnWords));
-        mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
-        mainPanel.addComponent(new Button("Wczytaj słownik", Main::loadDictionary));
-        mainPanel.addComponent(new Button("Wyjście", Main::exit));
-
+        mainPanel = new Panel();
+        updateMainPanel("main");
         mainWindow.addComponent(mainPanel);
         guiScreen.showWindow(mainWindow, GUIScreen.Position.CENTER);
     }
 
-    private static void addWord() {
-        Window addWordWindow = new Window("Dodaj nowe słówko");
-        addWordWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+    private static void updateMainPanel(String mode) {
+        mainPanel.removeAllComponents();
 
-        Panel panel = new Panel();
-        panel.addComponent(new Label("Podaj słówko (ang):"));
+        switch (mode) {
+            case "main" -> {
+                mainPanel.addComponent(new Button("Dodaj słówko", () -> updateMainPanel("addWord")));
+                mainPanel.addComponent(new Button("Wyszukaj słówko", () -> updateMainPanel("searchWord")));
+                mainPanel.addComponent(new Button("Nauka słówek", Main::startLearningSession));
+                mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
+                mainPanel.addComponent(new Button("Wczytaj słownik", Main::loadDictionary));
+                mainPanel.addComponent(new Button("Wyjście", Main::exit));
+            }
+            case "addWord" -> setupAddWordPanel();
+            case "searchWord" -> setupSearchWordPanel();
+            case "learning" -> setupLearningPanel();
+        }
+    }
+
+    private static void setupAddWordPanel() {
+        mainPanel.addComponent(new Label("Dodaj nowe słówko"));
+        mainPanel.addComponent(new Label("Podaj słówko (ang):"));
         TextBox wordInput = new TextBox();
-        panel.addComponent(wordInput);
-        panel.addComponent(new Label("Podaj tłumaczenie:"));
+        mainPanel.addComponent(wordInput);
+        mainPanel.addComponent(new Label("Podaj tłumaczenie:"));
         TextBox translationInput = new TextBox();
-        panel.addComponent(translationInput);
+        mainPanel.addComponent(translationInput);
 
-        panel.addComponent(new Button("Dodaj", () -> {
+        mainPanel.addComponent(new Button("Dodaj", () -> {
             String word = wordInput.getText();
             String translation = translationInput.getText();
 
             if (!word.isEmpty() && !translation.isEmpty()) {
                 dictionary.put(word, translation);
                 showMessage("Dodano słówko", "Słówko '" + word + "' zostało dodane.");
-                addWordWindow.close();
             } else {
                 showMessage("Błąd", "Podano nieprawidłowe słówko lub tłumaczenie.");
             }
+            updateMainPanel("main");
         }));
-
-        panel.addComponent(new Button("Anuluj", addWordWindow::close));
-
-        addWordWindow.addComponent(panel);
-        guiScreen.showWindow(addWordWindow, GUIScreen.Position.CENTER);
+        mainPanel.addComponent(new Button("Anuluj", () -> updateMainPanel("main")));
     }
 
-    private static void searchWord() {
-        Window searchWindow = new Window("Wyszukaj słówko");
-        searchWindow.setWindowSizeOverride(new TerminalSize(30, 10));
-
-        Panel panel = new Panel();
-        panel.addComponent(new Label("Podaj słówko (ang/pol):"));
+    private static void setupSearchWordPanel() {
+        mainPanel.addComponent(new Label("Wyszukaj słówko"));
+        mainPanel.addComponent(new Label("Podaj słówko (ang/pol):"));
         TextBox searchInput = new TextBox();
-        panel.addComponent(searchInput);
+        mainPanel.addComponent(searchInput);
 
-        panel.addComponent(new Button("Szukaj", () -> {
+        mainPanel.addComponent(new Button("Szukaj", () -> {
             String word = searchInput.getText();
             String translation = dictionary.get(word);
 
@@ -97,22 +94,21 @@ public class Main {
             } else {
                 showMessage("Nie znaleziono", "Słówko '" + word + "' nie zostało znalezione.");
             }
-            searchWindow.close();
+            updateMainPanel("main");
         }));
-
-        panel.addComponent(new Button("Anuluj", searchWindow::close));
-
-        searchWindow.addComponent(panel);
-        guiScreen.showWindow(searchWindow, GUIScreen.Position.CENTER);
+        mainPanel.addComponent(new Button("Anuluj", () -> updateMainPanel("main")));
     }
 
-    private static void learnWords() {
-        List<Map.Entry<String, String>> wordList = new ArrayList<>(dictionary.entrySet());
-        if(dictionary.size()==0) {
-            showMessage("Nie znaleziono","Słownik pusty, dodaj słówko aby móc korzystać z nauki.");
+    private static void startLearningSession() {
+        if (dictionary.isEmpty()) {
+            showMessage("Nie znaleziono", "Słownik pusty, dodaj słówko aby móc korzystać z nauki.");
             return;
         }
+        updateMainPanel("learning");
+    }
 
+    private static void setupLearningPanel() {
+        List<Map.Entry<String, String>> wordList = new ArrayList<>(dictionary.entrySet());
         Collections.shuffle(wordList);
 
         int[] index = {0};
@@ -120,36 +116,25 @@ public class Main {
         int[] incorrectCount = {0};
         int[] skippedCount = {0};
 
-        // Tworzenie okna nauki raz
-        Window learnWindow = new Window("Nauka słówek");
-        learnWindow.setWindowSizeOverride(new TerminalSize(40, 15));
-        showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow);
-
-        guiScreen.showWindow(learnWindow, GUIScreen.Position.CENTER);
+        showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
     }
 
-    private static void showLearningWindow(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount, Window learnWindow) {
-        // Sprawdzamy, czy osiągnięto koniec listy - jeśli tak, zamykamy okno nauki i pokazujemy podsumowanie
+    private static void showLearningContent(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount) {
+        mainPanel.removeAllComponents();
+
         if (index[0] >= wordList.size()) {
-            learnWindow.close(); // Zamyka okno nauki
-            showMessage("Koniec nauki!",
-                    "Poprawne odpowiedzi: " + correctCount[0] +
-                            "\nBłędne odpowiedzi: " + incorrectCount[0] +
-                            "\nPominięte odpowiedzi: " + skippedCount[0]);
+            showMessage("Koniec nauki!", "Poprawne odpowiedzi: " + correctCount[0] +
+                    "\nBłędne odpowiedzi: " + incorrectCount[0] +
+                    "\nPominięte odpowiedzi: " + skippedCount[0]);
+            updateMainPanel("main");
             return;
         }
 
-        // Resetowanie komponentów w oknie nauki
-        learnWindow.removeAllComponents(); // Usunięcie obecnych komponentów
-
-        Panel panel = new Panel();
-        Label wordLabel = new Label("Podaj tłumaczenie dla: " + wordList.get(index[0]).getKey());
+        mainPanel.addComponent(new Label("Podaj tłumaczenie dla: " + wordList.get(index[0]).getKey()));
         TextBox answerInput = new TextBox();
+        mainPanel.addComponent(answerInput);
 
-        panel.addComponent(wordLabel);
-        panel.addComponent(answerInput);
-
-        panel.addComponent(new Button("Sprawdź", () -> {
+        mainPanel.addComponent(new Button("Sprawdź", () -> {
             String correctAnswer = wordList.get(index[0]).getValue();
             String userAnswer = answerInput.getText().trim();
 
@@ -162,18 +147,28 @@ public class Main {
             }
 
             index[0]++;
-            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow); // Rekursywne wywołanie dla kolejnego słowa
+            showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
         }));
 
-        panel.addComponent(new Button("Pomiń", () -> {
+        mainPanel.addComponent(new Button("Pomiń", () -> {
             skippedCount[0]++;
             index[0]++;
-            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow);
+            showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
         }));
 
-        panel.addComponent(new Button("Anuluj", learnWindow::close));
+        mainPanel.addComponent(new Button("Anuluj", () -> updateMainPanel("main")));
+    }
 
-        learnWindow.addComponent(panel);
+    private static void showMessage(String title, String message) {
+        Window messageWindow = new Window(title);
+        messageWindow.setWindowSizeOverride(new TerminalSize(30, 7));
+
+        Panel panel = new Panel();
+        panel.addComponent(new Label(message));
+        panel.addComponent(new Button("OK", messageWindow::close));
+
+        messageWindow.addComponent(panel);
+        guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
     }
 
     private static void saveDictionary() {
@@ -243,18 +238,6 @@ public class Main {
         }));
 
         panel.addComponent(new Button("Anuluj", messageWindow::close));
-
-        messageWindow.addComponent(panel);
-        guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
-    }
-
-    private static void showMessage(String title, String message) {
-        Window messageWindow = new Window(title);
-        messageWindow.setWindowSizeOverride(new TerminalSize(30, 7));
-
-        Panel panel = new Panel();
-        panel.addComponent(new Label(message));
-        panel.addComponent(new Button("OK", messageWindow::close));
 
         messageWindow.addComponent(panel);
         guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
