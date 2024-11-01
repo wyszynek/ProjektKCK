@@ -35,7 +35,8 @@ public class Main {
             case "main" -> {
                 mainPanel.addComponent(new Button("Dodaj słówko", () -> updateMainPanel("addWord")));
                 mainPanel.addComponent(new Button("Wyszukaj słówko", () -> updateMainPanel("searchWord")));
-                mainPanel.addComponent(new Button("Nauka słówek", Main::startLearningSession));
+                //mainPanel.addComponent(new Button("Nauka słówek", Main::startLearningSession));
+                mainPanel.addComponent(new Button("Nauka słówek", Main::learningMode));
                 mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
                 mainPanel.addComponent(new Button("Wczytaj słownik", Main::loadDictionary));
                 mainPanel.addComponent(new Button("Wyjście", Main::exit));
@@ -105,6 +106,28 @@ public class Main {
             return;
         }
         updateMainPanel("learning");
+    }
+
+    private static void learningMode() {
+        Window actionMenuWindow = new Window("Wybierz tryb nauki");
+        actionMenuWindow.setWindowSizeOverride(new TerminalSize(30, 15));
+
+        Panel panel = new Panel();
+
+        panel.addComponent(new Button("Test", () -> {
+            startLearningSession();
+            actionMenuWindow.close();
+        }));
+
+        panel.addComponent(new Button("Dopasowanie", () -> {
+            startLearningSession();
+            actionMenuWindow.close();
+        }));
+
+        panel.addComponent(new Button("Wróć", actionMenuWindow::close));
+        updateMainPanel("main");
+        actionMenuWindow.addComponent(panel);
+        guiScreen.showWindow(actionMenuWindow, GUIScreen.Position.CENTER);
     }
 
     private static void setupLearningPanel() {
