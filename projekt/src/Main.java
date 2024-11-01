@@ -44,6 +44,7 @@ public class Main {
             case "addWord" -> setupAddWordPanel();
             case "searchWord" -> setupSearchWordPanel();
             case "learning" -> setupLearningPanel();
+            case "matching" -> setupMatchingLearningPanel();
         }
     }
 
@@ -116,18 +117,69 @@ public class Main {
 
         panel.addComponent(new Button("Test", () -> {
             startLearningSession();
-            actionMenuWindow.close();
         }));
 
         panel.addComponent(new Button("Dopasowanie", () -> {
-            startLearningSession();
-            actionMenuWindow.close();
+            startMatchingLearningSession();
         }));
 
         panel.addComponent(new Button("Wróć", actionMenuWindow::close));
         updateMainPanel("main");
         actionMenuWindow.addComponent(panel);
-        guiScreen.showWindow(actionMenuWindow, GUIScreen.Position.CENTER);
+        guiScreen.showWindow(actionMenuWindow, GUIScreen.Position.OVERLAPPING);
+    }
+
+    private static void startMatchingLearningSession() {
+        if (dictionary.size() < 4) {
+            showMessage("Nie znaleziono", "Słownik posiada za mało słówek aby uruchomić ten tryb (potrzeba min 5).");
+            updateMainPanel("main");
+            return;
+        }
+        updateMainPanel("matching");
+    }
+
+    private static void setupMatchingLearningPanel() {
+        mainPanel.removeAllComponents();
+
+        List<Map.Entry<String, String>> wordList = new ArrayList<>(dictionary.entrySet());
+        Collections.shuffle(wordList);
+
+        // Wybieramy losowe słówko jako poprawną odpowiedź
+        Map.Entry<String, String> correctEntry = wordList.get(0);
+
+        // Tworzymy listę błędnych odpowiedzi
+        Set<String> incorrectAnswers = new HashSet<>();
+        int i = 1;
+        while (incorrectAnswers.size() < 3 && i < wordList.size()) {
+            String incorrectAnswer = wordList.get(i).getValue();
+            if (!incorrectAnswer.equals(correctEntry.getValue())) {
+                incorrectAnswers.add(incorrectAnswer);
+            }
+            i++;
+        }
+
+        // Dodajemy prawidłową i nieprawidłowe odpowiedzi do listy wyboru
+        List<String> options = new ArrayList<>(incorrectAnswers);
+        options.add(correctEntry.getValue());
+        Collections.shuffle(options);
+
+        Panel matchingPanel = new Panel();
+        matchingPanel.addComponent(new Label("Wybierz tłumaczenie dla: " + correctEntry.getKey()));
+
+        for (String option : options) {
+            matchingPanel.addComponent(new Button(option, () -> {
+                if (option.equals(correctEntry.getValue())) {
+                    showMessage("Poprawnie!", "Gratulacje! To była poprawna odpowiedź.");
+                } else {
+                    showMessage("Niepoprawnie", "Spróbuj ponownie! Poprawna odpowiedź to: " + correctEntry.getValue());
+                }
+                updateMainPanel("matching");
+            }));
+        }
+
+        matchingPanel.addComponent(new Button("Powrót", () -> updateMainPanel("main")));
+        mainPanel.addComponent(matchingPanel);
+        guiScreen.getScreen().refresh();
     }
 
     private static void setupLearningPanel() {
