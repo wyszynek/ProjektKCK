@@ -51,19 +51,16 @@ public class Main {
         TextBox translationInput = new TextBox();
         panel.addComponent(translationInput);
 
-        panel.addComponent(new Button("Dodaj", new Action() {
-            @Override
-            public void doAction() {
-                String word = wordInput.getText();
-                String translation = translationInput.getText();
+        panel.addComponent(new Button("Dodaj", () -> {
+            String word = wordInput.getText();
+            String translation = translationInput.getText();
 
-                if (!word.isEmpty() && !translation.isEmpty()) {
-                    dictionary.put(word, translation);
-                    showMessage("Dodano słówko", "Słówko '" + word + "' zostało dodane.");
-                    addWordWindow.close();
-                } else {
-                    showMessage("Błąd", "Podano nieprawidłowe słówko lub tłumaczenie.");
-                }
+            if (!word.isEmpty() && !translation.isEmpty()) {
+                dictionary.put(word, translation);
+                showMessage("Dodano słówko", "Słówko '" + word + "' zostało dodane.");
+                addWordWindow.close();
+            } else {
+                showMessage("Błąd", "Podano nieprawidłowe słówko lub tłumaczenie.");
             }
         }));
 
@@ -82,28 +79,25 @@ public class Main {
         TextBox searchInput = new TextBox();
         panel.addComponent(searchInput);
 
-        panel.addComponent(new Button("Szukaj", new Action() {
-            @Override
-            public void doAction() {
-                String word = searchInput.getText();
-                String translation = dictionary.get(word);
+        panel.addComponent(new Button("Szukaj", () -> {
+            String word = searchInput.getText();
+            String translation = dictionary.get(word);
 
-                if (translation == null) {
-                    for (Map.Entry<String, String> entry : dictionary.entrySet()) {
-                        if (entry.getValue().equalsIgnoreCase(word)) {
-                            translation = entry.getKey();
-                            break;
-                        }
+            if (translation == null) {
+                for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+                    if (entry.getValue().equalsIgnoreCase(word)) {
+                        translation = entry.getKey();
+                        break;
                     }
                 }
-
-                if (translation != null) {
-                    showMessage("Wynik wyszukiwania", "Słówko: " + word + "\nTłumaczenie: " + translation);
-                } else {
-                    showMessage("Nie znaleziono", "Słówko '" + word + "' nie zostało znalezione.");
-                }
-                searchWindow.close();
             }
+
+            if (translation != null) {
+                showMessage("Wynik wyszukiwania", "Słówko: " + word + "\nTłumaczenie: " + translation);
+            } else {
+                showMessage("Nie znaleziono", "Słówko '" + word + "' nie zostało znalezione.");
+            }
+            searchWindow.close();
         }));
 
         panel.addComponent(new Button("Anuluj", searchWindow::close));
@@ -183,17 +177,14 @@ public class Main {
         TextBox fileNameInput = new TextBox();
         panel.addComponent(fileNameInput);
 
-        panel.addComponent(new Button("Zapisz", new Action() {
-            @Override
-            public void doAction() {
-                String fileName = fileNameInput.getText();
-                if (!fileName.isEmpty()) {
-                    saveDictionary(fileName);
-                    showMessage("Zapisano", "Słownik został zapisany do pliku: " + fileName);
-                    saveWindow.close();
-                } else {
-                    showMessage("Błąd", "Nazwa pliku nie może być pusta.");
-                }
+        panel.addComponent(new Button("Zapisz", () -> {
+            String fileName = fileNameInput.getText();
+            if (!fileName.isEmpty()) {
+                saveDictionary(fileName);
+                showMessage("Zapisano", "Słownik został zapisany do pliku: " + fileName);
+                saveWindow.close();
+            } else {
+                showMessage("Błąd", "Nazwa pliku nie może być pusta.");
             }
         }));
 
@@ -212,18 +203,15 @@ public class Main {
         TextBox fileNameInput = new TextBox();
         panel.addComponent(fileNameInput);
 
-        panel.addComponent(new Button("Wczytaj", new Action() {
-            @Override
-            public void doAction() {
-                String fileName = fileNameInput.getText();
-                if (!fileName.isEmpty()) {
-                    dictionary.clear(); // Czyszczenie obecnego słownika
-                    loadDictionary(fileName);
-                    showMessage("Wczytano", "Słownik został wczytany z pliku: " + fileName);
-                    loadWindow.close();
-                } else {
-                    showMessage("Błąd", "Nazwa pliku nie może być pusta.");
-                }
+        panel.addComponent(new Button("Wczytaj", () -> {
+            String fileName = fileNameInput.getText();
+            if (!fileName.isEmpty()) {
+                dictionary.clear(); // Czyszczenie obecnego słownika
+                loadDictionary(fileName);
+                showMessage("Wczytano", "Słownik został wczytany z pliku: " + fileName);
+                loadWindow.close();
+            } else {
+                showMessage("Błąd", "Nazwa pliku nie może być pusta.");
             }
         }));
 
