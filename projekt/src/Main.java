@@ -25,7 +25,7 @@ public class Main {
         mainWindow.setWindowSizeOverride(new TerminalSize(40, 15));
         mainWindow.setSoloWindow(true);
 
-        loadDictionary("abc1.txt");
+        //loadDictionary("abc1.txt");
 
         Panel mainPanel = new Panel();
         mainPanel.addComponent(new Button("Dodaj słówko", Main::addWord));
@@ -108,18 +108,30 @@ public class Main {
 
     private static void learnWords() {
         List<Map.Entry<String, String>> wordList = new ArrayList<>(dictionary.entrySet());
+        if(dictionary.size()==0) {
+            showMessage("Nie znaleziono","Słownik pusty, dodaj słówko aby móc korzystać z nauki.");
+            return;
+        }
+
         Collections.shuffle(wordList);
 
         int[] index = {0};
         int[] correctCount = {0};
         int[] incorrectCount = {0};
-        int[] skippedCount  = {0};
+        int[] skippedCount = {0};
 
-        showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount );
+        // Tworzenie okna nauki raz
+        Window learnWindow = new Window("Nauka słówek");
+        learnWindow.setWindowSizeOverride(new TerminalSize(40, 15));
+        showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow);
+
+        guiScreen.showWindow(learnWindow, GUIScreen.Position.CENTER);
     }
 
-    private static void showLearningWindow(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount ) {
+    private static void showLearningWindow(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount, Window learnWindow) {
+        // Sprawdzamy, czy osiągnięto koniec listy - jeśli tak, zamykamy okno nauki i pokazujemy podsumowanie
         if (index[0] >= wordList.size()) {
+            learnWindow.close(); // Zamyka okno nauki
             showMessage("Koniec nauki!",
                     "Poprawne odpowiedzi: " + correctCount[0] +
                             "\nBłędne odpowiedzi: " + incorrectCount[0] +
@@ -127,8 +139,8 @@ public class Main {
             return;
         }
 
-        Window learnWindow = new Window("Nauka słówek");
-        learnWindow.setWindowSizeOverride(new TerminalSize(40, 15));
+        // Resetowanie komponentów w oknie nauki
+        learnWindow.removeAllComponents(); // Usunięcie obecnych komponentów
 
         Panel panel = new Panel();
         Label wordLabel = new Label("Podaj tłumaczenie dla: " + wordList.get(index[0]).getKey());
@@ -150,89 +162,38 @@ public class Main {
             }
 
             index[0]++;
-            learnWindow.close();
-            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount);
+            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow); // Rekursywne wywołanie dla kolejnego słowa
         }));
-
-        panel.addComponent(new Button("Anuluj", learnWindow::close));
 
         panel.addComponent(new Button("Pomiń", () -> {
             skippedCount[0]++;
             index[0]++;
-            learnWindow.close();
-            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount);
+            showLearningWindow(wordList, index, correctCount, incorrectCount, skippedCount, learnWindow);
         }));
+
+        panel.addComponent(new Button("Anuluj", learnWindow::close));
 
         learnWindow.addComponent(panel);
-        guiScreen.showWindow(learnWindow, GUIScreen.Position.CENTER);
     }
-
 
     private static void saveDictionary() {
-        Window saveWindow = new Window("Zapisz słownik");
-        saveWindow.setWindowSizeOverride(new TerminalSize(30, 10));
-
-        Panel panel = new Panel();
-        panel.addComponent(new Label("Podaj nazwę pliku:"));
-        TextBox fileNameInput = new TextBox();
-        panel.addComponent(fileNameInput);
-
-        panel.addComponent(new Button("Zapisz", () -> {
-            String fileName = fileNameInput.getText();
-            if (!fileName.isEmpty()) {
-                saveDictionary(fileName);
+        String fileName = promptFileName("Zapisz słownik", "Podaj nazwę pliku:");
+        if (!fileName.isEmpty()) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+                for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+                    writer.println(entry.getKey() + "=" + entry.getValue());
+                }
                 showMessage("Zapisano", "Słownik został zapisany do pliku: " + fileName);
-                saveWindow.close();
-            } else {
-                showMessage("Błąd", "Nazwa pliku nie może być pusta.");
+            } catch (IOException e) {
+                showMessage("Błąd zapisu", "Nie udało się zapisać słownika do pliku: " + fileName);
             }
-        }));
-
-        panel.addComponent(new Button("Anuluj", saveWindow::close));
-
-        saveWindow.addComponent(panel);
-        guiScreen.showWindow(saveWindow, GUIScreen.Position.CENTER);
-    }
-
-    private static void loadDictionary() {
-        Window loadWindow = new Window("Wczytaj słownik");
-        loadWindow.setWindowSizeOverride(new TerminalSize(30, 10));
-
-        Panel panel = new Panel();
-        panel.addComponent(new Label("Podaj nazwę pliku do wczytania:"));
-        TextBox fileNameInput = new TextBox();
-        panel.addComponent(fileNameInput);
-
-        panel.addComponent(new Button("Wczytaj", () -> {
-            String fileName = fileNameInput.getText();
-            if (!fileName.isEmpty()) {
-                dictionary.clear(); // Czyszczenie obecnego słownika
-                loadDictionary(fileName);
-                showMessage("Wczytano", "Słownik został wczytany z pliku: " + fileName);
-                loadWindow.close();
-            } else {
-                showMessage("Błąd", "Nazwa pliku nie może być pusta.");
-            }
-        }));
-
-        panel.addComponent(new Button("Anuluj", loadWindow::close));
-
-        loadWindow.addComponent(panel);
-        guiScreen.showWindow(loadWindow, GUIScreen.Position.CENTER);
-    }
-
-    private static void saveDictionary(String fileName) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
-            for (Map.Entry<String, String> entry : dictionary.entrySet()) {
-                writer.println(entry.getKey() + "=" + entry.getValue());
-            }
-        } catch (IOException e) {
-            showMessage("Błąd zapisu", "Nie udało się zapisać słownika do pliku: " + fileName);
         }
     }
 
-    private static void loadDictionary(String fileName) {
-        if (Files.exists(Paths.get(fileName))) {
+    private static void loadDictionary() {
+        String fileName = promptFileName("Wczytaj słownik", "Podaj nazwę pliku do wczytania:");
+        if (!fileName.isEmpty()) {
+            dictionary.clear();
             try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -241,22 +202,55 @@ public class Main {
                         dictionary.put(parts[0], parts[1]);
                     }
                 }
+                showMessage("Wczytano", "Słownik został wczytany z pliku: " + fileName);
             } catch (IOException e) {
                 showMessage("Błąd odczytu", "Nie udało się wczytać słownika z pliku: " + fileName);
             }
-        } else {
-            showMessage("Błąd", "Plik o nazwie " + fileName + " nie istnieje.");
         }
     }
 
-    private static void showMessage(String title, String message) {
-        if (guiScreen == null) {
-            System.err.println("Error: guiScreen is null, cannot display message.");
-            return;
-        }
+    private static String promptFileName(String windowTitle, String promptText) {
+        final String[] fileName = {""};
+        Window fileNameWindow = new Window(windowTitle);
+        fileNameWindow.setWindowSizeOverride(new TerminalSize(30, 10));
 
+        Panel panel = new Panel();
+        panel.addComponent(new Label(promptText));
+        TextBox fileNameInput = new TextBox();
+        panel.addComponent(fileNameInput);
+
+        panel.addComponent(new Button("OK", () -> {
+            fileName[0] = fileNameInput.getText();
+            fileNameWindow.close();
+        }));
+        panel.addComponent(new Button("Anuluj", fileNameWindow::close));
+
+        fileNameWindow.addComponent(panel);
+        guiScreen.showWindow(fileNameWindow, GUIScreen.Position.CENTER);
+
+        return fileName[0];
+    }
+
+    private static void exit() {
+        Window messageWindow = new Window("Wyjście");
+        messageWindow.setWindowSizeOverride(new TerminalSize(40, 7));
+
+        Panel panel = new Panel();
+        panel.addComponent(new Label("Niezapisany słownik nie zostanie \nutworzony, czy napewno chcesz wyjść?"));
+        panel.addComponent(new Button("Wyjdź", () -> {
+            guiScreen.getScreen().stopScreen();
+            System.exit(0);
+        }));
+
+        panel.addComponent(new Button("Anuluj", messageWindow::close));
+
+        messageWindow.addComponent(panel);
+        guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
+    }
+
+    private static void showMessage(String title, String message) {
         Window messageWindow = new Window(title);
-        messageWindow.setWindowSizeOverride(new TerminalSize(30, 6));
+        messageWindow.setWindowSizeOverride(new TerminalSize(30, 7));
 
         Panel panel = new Panel();
         panel.addComponent(new Label(message));
@@ -264,10 +258,5 @@ public class Main {
 
         messageWindow.addComponent(panel);
         guiScreen.showWindow(messageWindow, GUIScreen.Position.CENTER);
-    }
-
-    private static void exit() {
-        guiScreen.getScreen().stopScreen();
-        System.exit(0);
     }
 }
