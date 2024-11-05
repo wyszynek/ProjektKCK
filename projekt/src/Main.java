@@ -180,12 +180,18 @@ public class Main {
         int[] incorrectCount = {0};
         int[] skippedCount = {0};
 
-        showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
+        // Lista do przechowywania pytań, które zostały pominięte po raz pierwszy
+        List<Map.Entry<String, String>> firstSkippedQuestions = new ArrayList<>();
+
+        // Wywołanie metody do wyświetlenia pytania
+        showLearningContent(wordList, firstSkippedQuestions, index, correctCount, incorrectCount, skippedCount);
     }
 
-    private static void showLearningContent(List<Map.Entry<String, String>> wordList, int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount) {
+    private static void showLearningContent(List<Map.Entry<String, String>> wordList, List<Map.Entry<String, String>> firstSkippedQuestions,
+                                            int[] index, int[] correctCount, int[] incorrectCount, int[] skippedCount) {
         mainPanel.removeAllComponents();
 
+        // Sprawdza, czy indeks jest poza listą pytań
         if (index[0] >= wordList.size()) {
             showMessage("Koniec nauki!", "Poprawne odpowiedzi: " + correctCount[0] +
                     "\nBłędne odpowiedzi: " + incorrectCount[0] +
@@ -194,12 +200,15 @@ public class Main {
             return;
         }
 
-        mainPanel.addComponent(new Label("Podaj tłumaczenie dla: " + wordList.get(index[0]).getKey()));
+        // Wyświetla pytanie
+        Map.Entry<String, String> currentQuestion = wordList.get(index[0]);
+        mainPanel.addComponent(new Label("Podaj tłumaczenie dla: " + currentQuestion.getKey()));
         TextBox answerInput = new TextBox();
         mainPanel.addComponent(answerInput);
 
+        // Przycisk "Sprawdź" do sprawdzania odpowiedzi
         mainPanel.addComponent(new Button("Sprawdź", () -> {
-            String correctAnswer = wordList.get(index[0]).getValue();
+            String correctAnswer = currentQuestion.getValue();
             String userAnswer = answerInput.getText().trim();
 
             if (userAnswer.equalsIgnoreCase(correctAnswer)) {
@@ -207,20 +216,35 @@ public class Main {
                 showMessage("Poprawnie", "Dobrze! Poprawna odpowiedź.");
             } else {
                 incorrectCount[0]++;
-                showMessage("Niepoprawnie", "Źle. Poprawna odpowiedź: " + correctAnswer);
+                showMessage("Niepoprawnie", "Źle. Poprawna odpowiedź:\n" + correctAnswer);
             }
 
             index[0]++;
-            showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
+            showLearningContent(wordList, firstSkippedQuestions, index, correctCount, incorrectCount, skippedCount);
         }));
 
+        // Przycisk "Pomiń" do pominięcia pytania
         mainPanel.addComponent(new Button("Pomiń", () -> {
-            skippedCount[0]++;
+            String correctAnswer = currentQuestion.getValue();
+
+            // Jeśli pytanie jest pominięte po raz pierwszy, pokażemy poprawną odpowiedź i przeniesiemy je na koniec listy
+            if (!firstSkippedQuestions.contains(currentQuestion)) {
+                skippedCount[0]++;
+                firstSkippedQuestions.add(currentQuestion);
+                wordList.add(currentQuestion);  // Dodajemy na koniec listy do ponownego podejścia
+            } else {
+                // Jeśli już było raz pominięte, zwiększamy licznik ostatecznych pominięć
+                skippedCount[0]++;
+                showMessage("Pominięte", "Poprawna odpowiedź to:\n" + correctAnswer);
+            }
+
             index[0]++;
-            showLearningContent(wordList, index, correctCount, incorrectCount, skippedCount);
+            showLearningContent(wordList, firstSkippedQuestions, index, correctCount, incorrectCount, skippedCount);
         }));
 
+        // Przycisk "Anuluj" do powrotu do głównego menu
         mainPanel.addComponent(new Button("Anuluj", () -> updateMainPanel("main")));
+        guiScreen.getScreen().refresh();
     }
 
     private static void showMessage(String title, String message) {
