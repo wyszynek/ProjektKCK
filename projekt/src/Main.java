@@ -35,7 +35,6 @@ public class Main {
             case "main" -> {
                 mainPanel.addComponent(new Button("Dodaj słówko", () -> updateMainPanel("addWord")));
                 mainPanel.addComponent(new Button("Wyszukaj słówko", () -> updateMainPanel("searchWord")));
-                //mainPanel.addComponent(new Button("Nauka słówek", Main::startLearningSession));
                 mainPanel.addComponent(new Button("Nauka słówek", Main::learningMode));
                 mainPanel.addComponent(new Button("Zapisz słownik", Main::saveDictionary));
                 mainPanel.addComponent(new Button("Wczytaj słownik", Main::loadDictionary));
@@ -101,38 +100,28 @@ public class Main {
         mainPanel.addComponent(new Button("Anuluj", () -> updateMainPanel("main")));
     }
 
+    private static void learningMode() {
+        mainPanel.removeAllComponents();
+        mainPanel.addComponent(new Label("Wybierz tryb nauki"));
+
+        mainPanel.addComponent(new Button("Test", Main::startLearningSession));
+        mainPanel.addComponent(new Button("Dopasowanie", Main::startMatchingLearningSession));
+        mainPanel.addComponent(new Button("Powrót", () -> updateMainPanel("main")));
+
+        guiScreen.getScreen().refresh();
+    }
+
     private static void startLearningSession() {
         if (dictionary.isEmpty()) {
-            showMessage("Nie znaleziono", "Słownik pusty, dodaj słówko aby móc korzystać z nauki.");
+            showMessage("Nie znaleziono", "Słownik pusty, dodaj \nsłówko aby móc korzystać \nz nauki.");
             return;
         }
         updateMainPanel("learning");
     }
 
-    private static void learningMode() {
-        Window actionMenuWindow = new Window("Wybierz tryb nauki");
-        actionMenuWindow.setWindowSizeOverride(new TerminalSize(30, 15));
-
-        Panel panel = new Panel();
-
-        panel.addComponent(new Button("Test", () -> {
-            startLearningSession();
-        }));
-
-        panel.addComponent(new Button("Dopasowanie", () -> {
-            startMatchingLearningSession();
-        }));
-
-        panel.addComponent(new Button("Wróć", actionMenuWindow::close));
-        updateMainPanel("main");
-        actionMenuWindow.addComponent(panel);
-        guiScreen.showWindow(actionMenuWindow, GUIScreen.Position.OVERLAPPING);
-    }
-
     private static void startMatchingLearningSession() {
         if (dictionary.size() < 4) {
-            showMessage("Nie znaleziono", "Słownik posiada za mało słówek aby uruchomić ten tryb (potrzeba min 5).");
-            updateMainPanel("main");
+            showMessage("Nie znaleziono", "Słownik posiada za mało \nsłówek aby uruchomić ten \ntryb (potrzeba min 5).");
             return;
         }
         updateMainPanel("matching");
