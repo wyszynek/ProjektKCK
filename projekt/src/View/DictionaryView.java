@@ -26,6 +26,7 @@ public class DictionaryView {
         mainPanel.addComponent(new Button("Dodaj słówko", controller::showAddWordPanel));
         mainPanel.addComponent(new Button("Wyszukaj słówko", controller::showSearchWordPanel));
         mainPanel.addComponent(new Button("Nauka słówek", controller::showLearningModes));
+        mainPanel.addComponent(new Button("Lista słówek", controller::showAllWordsPanel));
         mainPanel.addComponent(new Button("Zapisz słownik", controller::saveDictionary));
         mainPanel.addComponent(new Button("Wczytaj słownik", controller::loadDictionary));
         mainPanel.addComponent(new Button("Wyjście", controller::exit));
@@ -35,6 +36,22 @@ public class DictionaryView {
         mainWindow.setSoloWindow(true);
         mainWindow.addComponent(mainPanel);
         guiScreen.showWindow(mainWindow, GUIScreen.Position.CENTER);
+    }
+
+    public void showAllWordsPanel(Map<String, String> allWords, DictionaryController controller) {
+        mainPanel.removeAllComponents();
+        if(allWords.isEmpty()) {
+            mainPanel.addComponent(new Label("Brak słówek w słowniku."));
+            mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
+            Button b = new Button("Powrót", controller::showMainMenu);
+        }
+        else {
+            mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
+            for (Map.Entry<String, String> entry : allWords.entrySet()) {
+                mainPanel.addComponent(new Label(entry.getKey() + " - " + entry.getValue()));
+            }
+            guiScreen.getScreen().refresh();
+        }
     }
 
     public void showMessage(String title, String message) {

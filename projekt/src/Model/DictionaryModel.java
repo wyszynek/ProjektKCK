@@ -89,8 +89,8 @@ public class DictionaryModel {
         currentIndex = 0;
         skippedWords.clear();
         shuffledWords.clear();
-        shuffledWords.addAll(dictionary.keySet());  // Refresh the shuffled list
-        Collections.shuffle(shuffledWords, random); // Shuffle again when restarting
+        shuffledWords.addAll(dictionary.keySet());
+        Collections.shuffle(shuffledWords, random);
         correctAnswers = 0;
         incorrectAnswers = 0;
         skippedAnswers = 0;

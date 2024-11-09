@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class DictionaryController {
     private DictionaryModel model;
@@ -42,6 +43,11 @@ public class DictionaryController {
 
     public void exit() {
         view.exit();
+    }
+
+    public void showAllWordsPanel() {
+        Map<String, String> allWords = model.getDictionary(); // Pobiera wszystkie słowa
+        view.showAllWordsPanel(allWords, this);
     }
 
     public void addWord(String word, String translation) {
@@ -211,5 +217,17 @@ public class DictionaryController {
             view.showMessage("Niepoprawna odpowiedź", "Poprawna odpowiedź to:\n" + correctTranslation);
         }
         continueMatching();
+    }
+
+    public void showAllWords() {
+        Map<String, String> allWords = model.getDictionary(); // Pobiera wszystkie słowa
+        StringBuilder wordList = new StringBuilder();
+
+        for (Map.Entry<String, String> entry : allWords.entrySet()) {
+            wordList.append("Słówko: ").append(entry.getKey())
+                    .append(" - Tłumaczenie: ").append(entry.getValue())
+                    .append("\n");
+        }
+
     }
 }
