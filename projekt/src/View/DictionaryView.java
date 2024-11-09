@@ -57,11 +57,10 @@ public class DictionaryView {
         panel.addComponent(new Label("Twoja odpowiedź: " + userTranslation));
         panel.addComponent(new Label("Poprawna odpowiedź: " + correctTranslation));
 
-        panel.addComponent(new Button("Ok", () -> {
+        panel.addComponent(new Button("Następne słówko", () -> {
             incorrectAnswerWindow.close();
             controller.continueLearning();
         }));
-        panel.addComponent(new Button("Spróbuj ponownie", incorrectAnswerWindow::close));
         panel.addComponent(new Button("Oznacz jako poprawne", () -> {
             controller.markAnswerAsCorrect();
             incorrectAnswerWindow.close();
