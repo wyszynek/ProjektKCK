@@ -1,0 +1,5 @@
+orange=pomarancz
+apple=jablko
+city=miasto
+village=wies
+home=dom

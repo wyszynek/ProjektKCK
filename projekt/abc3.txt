@@ -1,0 +1,7 @@
+orange=pomarancz
+apple=jablko
+city=miasto
+car=samochod
+village=wies
+home=dom
+carrot=marchew
