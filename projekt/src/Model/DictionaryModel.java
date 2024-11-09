@@ -5,7 +5,7 @@ import java.util.*;
 
 public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
-    private Set<String> testedWords = new HashSet<>();
+    private Set<String> shuffledWords = new HashSet<>();
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;
     private int skippedAnswers = 0;
@@ -44,16 +44,16 @@ public class DictionaryModel {
     }
 
     public String getRandomWord() {
-        if (testedWords.size() == dictionary.size()) {
+        if (shuffledWords.size() == dictionary.size()) {
             return null; // Wszystkie słówka zostały przetestowane
         }
         String word;
         do {
             Object[] words = dictionary.keySet().toArray();
             word = (String) words[random.nextInt(words.length)];
-        } while (testedWords.contains(word));
+        } while (shuffledWords.contains(word));
 
-        testedWords.add(word);
+        shuffledWords.add(word);
         return word;
     }
 
@@ -75,7 +75,7 @@ public class DictionaryModel {
         incorrectAnswers = Math.max(0, incorrectAnswers - 1);
     }
     public void resetProgress() {
-        testedWords.clear();
+        shuffledWords.clear();
         correctAnswers = 0;
         incorrectAnswers = 0;
         skippedAnswers = 0;
