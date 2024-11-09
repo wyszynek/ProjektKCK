@@ -119,11 +119,12 @@ public class DictionaryController {
             return;
         }
         model.resetProgress();
+        model.shuffleWords();
         continueLearning();
     }
 
     public void continueLearning() {
-        String word = model.getRandomWord();
+        String word = model.getNextWord(); // Using getNextWord() now
         if (word != null) {
             view.showLearningPanel(this, word);
         } else {
@@ -171,11 +172,12 @@ public class DictionaryController {
             return;
         }
         model.resetProgress();
+        model.shuffleWords();
         continueMatching();
     }
 
     public void continueMatching() {
-        String word = model.getRandomWord();
+        String word = model.getNextWord(); // Using getNextWord() now
         if (word != null) {
             List<String> options = model.getMatchingOptions(word, 4);
             view.showMatchingPanel(this, word, options);

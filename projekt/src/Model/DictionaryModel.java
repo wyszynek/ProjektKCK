@@ -5,7 +5,8 @@ import java.util.*;
 
 public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
-    private Set<String> shuffledWords = new HashSet<>();
+    private List<String> shuffledWords = new ArrayList<>();
+    private int currentIndex = 0;
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;
     private int skippedAnswers = 0;
@@ -43,18 +44,16 @@ public class DictionaryModel {
         return translation;
     }
 
-    public String getRandomWord() {
-        if (shuffledWords.size() == dictionary.size()) {
-            return null; // Wszystkie słówka zostały przetestowane
-        }
-        String word;
-        do {
-            Object[] words = dictionary.keySet().toArray();
-            word = (String) words[random.nextInt(words.length)];
-        } while (shuffledWords.contains(word));
+    public void shuffleWords() {
+        Collections.shuffle(shuffledWords, random);
+        currentIndex = 0; // Reset the current index to start from the beginning after shuffling
+    }
 
-        shuffledWords.add(word);
-        return word;
+    public String getNextWord() {
+        if (currentIndex < shuffledWords.size()) {
+            return shuffledWords.get(currentIndex++);
+        }
+        return null; // No more words left to test
     }
 
     public boolean isCorrectTranslation(String word, String userTranslation) {
@@ -75,7 +74,10 @@ public class DictionaryModel {
         incorrectAnswers = Math.max(0, incorrectAnswers - 1);
     }
     public void resetProgress() {
+        currentIndex = 0;
         shuffledWords.clear();
+        shuffledWords.addAll(dictionary.keySet());  // Refresh the shuffled list
+        Collections.shuffle(shuffledWords, random); // Shuffle again when restarting
         correctAnswers = 0;
         incorrectAnswers = 0;
         skippedAnswers = 0;
