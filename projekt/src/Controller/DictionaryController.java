@@ -148,14 +148,30 @@ public class DictionaryController {
         continueLearning();
     }
 
-    public void skipWord() {
-        model.increaseSkippedAnswers();
-        continueLearning();
+    public void skipWord(String word) {
+        if (!model.getSkippedWords().contains(word)) {
+            model.increaseSkippedAnswers();
+            model.getSkippedWords().add(word);
+            model.getShuffledWords().add(word);
+            continueLearning();
+        } else {
+            String correctTranslation = model.searchWord(word);
+            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to: " + correctTranslation);
+            continueLearning();
+        }
     }
 
-    public void skipWord2() {
-        model.increaseSkippedAnswers();
-        continueMatching();
+    public void skipWord2(String word) {
+        if (!model.getSkippedWords().contains(word)) {
+            model.increaseSkippedAnswers();
+            model.getSkippedWords().add(word);
+            model.getShuffledWords().add(word);
+            continueMatching();
+        } else {
+            String correctTranslation = model.searchWord(word);
+            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to: " + correctTranslation);
+            continueMatching();
+        }
     }
 
     public void endLearningSession() {

@@ -120,7 +120,9 @@ public class DictionaryView {
         mainPanel.addComponent(new Button("Sprawdź", () -> {
             controller.checkAnswer(word, translationInput.getText());
         }));
-        mainPanel.addComponent(new Button("Pomiń", controller::skipWord));
+        mainPanel.addComponent(new Button("Pomiń", () -> {
+            controller.skipWord(word);
+        }));
         mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
 
         guiScreen.getScreen().refresh();
@@ -153,7 +155,9 @@ public class DictionaryView {
         }
 
         mainPanel.addComponent(new EmptySpace());
-        mainPanel.addComponent(new Button("Pomiń", controller::skipWord2));
+        mainPanel.addComponent(new Button("Pomiń", () -> {
+            controller.skipWord2(word);
+        }));
         mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
 
         guiScreen.getScreen().refresh();

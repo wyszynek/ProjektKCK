@@ -6,6 +6,7 @@ import java.util.*;
 public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
     private List<String> shuffledWords = new ArrayList<>();
+    private List<String> skippedWords = new ArrayList<>();
     private int currentIndex = 0;
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;
@@ -58,7 +59,11 @@ public class DictionaryModel {
 
     public boolean isCorrectTranslation(String word, String userTranslation) {
         boolean correct = dictionary.get(word).equalsIgnoreCase(userTranslation);
+        boolean inSkippedList = skippedWords.contains(word);
         if (correct) {
+            if(inSkippedList) {
+                skippedAnswers--;
+            }
             correctAnswers++;
         } else {
             incorrectAnswers++;
@@ -66,15 +71,23 @@ public class DictionaryModel {
         return correct;
     }
 
-    public int increaseSkippedAnswers() {
-        return skippedAnswers++;
+    public void increaseSkippedAnswers() {
+        skippedAnswers++;
     }
+
     public void markAnswerAsCorrect() {
         correctAnswers++;
         incorrectAnswers = Math.max(0, incorrectAnswers - 1);
     }
+
+    public void markSkippedAsCorrect() {
+        correctAnswers++;
+        --skippedAnswers;
+    }
+
     public void resetProgress() {
         currentIndex = 0;
+        skippedWords.clear();
         shuffledWords.clear();
         shuffledWords.addAll(dictionary.keySet());  // Refresh the shuffled list
         Collections.shuffle(shuffledWords, random); // Shuffle again when restarting
@@ -93,6 +106,14 @@ public class DictionaryModel {
 
     public int getSkippedAnswers() {
         return skippedAnswers;
+    }
+
+    public List<String> getSkippedWords() {
+        return this.skippedWords;
+    }
+
+    public List<String> getShuffledWords() {
+        return this.shuffledWords;
     }
 
     public List<String> getMatchingOptions(String word, int numberOfOptions) {
