@@ -20,6 +20,26 @@ public class DictionaryModel {
     public void addWord(String word, String translation) {
         dictionary.put(word, translation);
     }
+    public boolean removeWord(String word) {
+        if (dictionary.containsKey(word)) {
+            dictionary.remove(word);
+            return true;
+        } else {
+            // Szukamy w wartościach
+            String keyToRemove = null;
+            for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+                if (entry.getValue().equals(word)) {
+                    keyToRemove = entry.getKey();
+                    break;
+                }
+            }
+            if (keyToRemove != null) {
+                dictionary.remove(keyToRemove);
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean wordExists(String word) {
         return dictionary.containsKey(word);

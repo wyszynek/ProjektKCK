@@ -24,7 +24,7 @@ public class DictionaryView {
     public void showMainMenu(DictionaryController controller) {
         mainPanel = new Panel();
         mainPanel.addComponent(new Button("Dodaj słówko", controller::showAddWordPanel));
-        mainPanel.addComponent(new Button("Wyszukaj słówko", controller::showSearchWordPanel));
+        mainPanel.addComponent(new Button("Usuń słówko", controller::showDeleteWordPanel));
         mainPanel.addComponent(new Button("Nauka słówek", controller::showLearningModes));
         mainPanel.addComponent(new Button("Lista słówek", controller::showAllWordsPanel));
         mainPanel.addComponent(new Button("Zapisz słownik", controller::saveDictionary));
@@ -43,9 +43,9 @@ public class DictionaryView {
         if(allWords.isEmpty()) {
             mainPanel.addComponent(new Label("Brak słówek w słowniku."));
             mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
-            Button b = new Button("Powrót", controller::showMainMenu);
         }
         else {
+            mainPanel.addComponent(new Button("Wyszukaj słówko", controller::showSearchWordPanel));
             mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
             for (Map.Entry<String, String> entry : allWords.entrySet()) {
                 mainPanel.addComponent(new Label(entry.getKey() + " - " + entry.getValue()));
@@ -100,6 +100,18 @@ public class DictionaryView {
         mainPanel.addComponent(new Button("Dodaj", () -> controller.addWord(wordInput.getText(), translationInput.getText())));
         mainPanel.addComponent(new Button("Anuluj", controller::showMainMenu));
 
+        guiScreen.getScreen().refresh();
+    }
+
+    public void showDeletionWordPanel(DictionaryController controller) {
+        mainPanel.removeAllComponents();
+        mainPanel.addComponent(new Label("Usuwanie słówka"));
+        mainPanel.addComponent(new Label("Podaj słówko do usunięcia (ang/pl):"));
+        TextBox wordInput = new TextBox();
+        mainPanel.addComponent(wordInput);
+
+        mainPanel.addComponent(new Button("Usuń", () -> controller.deleteWord(wordInput.getText())));
+        mainPanel.addComponent(new Button("Anuluj", controller::showMainMenu));
         guiScreen.getScreen().refresh();
     }
 

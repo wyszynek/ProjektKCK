@@ -10,8 +10,6 @@ import com.googlecode.lanterna.gui.component.Panel;
 import com.googlecode.lanterna.gui.component.TextBox;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +38,9 @@ public class DictionaryController {
     public void showLearningModes() {
         view.learningMode(this);
     }
+    public void showDeleteWordPanel() {
+        view.showDeletionWordPanel(this);
+    }
 
     public void exit() {
         view.exit();
@@ -58,6 +59,15 @@ public class DictionaryController {
             view.showMessage("Dodano słówko", "Słówko '" + word + "' zostało dodane.");
         } else {
             view.showMessage("Błąd", "Podano nieprawidłowe \nsłówko lub tłumaczenie.");
+        }
+        showMainMenu();
+    }
+
+    public void deleteWord(String word) {
+        if (model.removeWord(word)) {
+            view.showMessage("Usunięto słówko", "Słówko '" + word + "' zostało \nusunięte.");
+        } else {
+            view.showMessage("Błąd", "Podano nieprawidłowe słówko \nlub takie nie istnieje.");
         }
         showMainMenu();
     }
