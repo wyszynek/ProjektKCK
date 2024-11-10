@@ -12,6 +12,7 @@ public class DictionaryModel {
     private int incorrectAnswers = 0;
     private int skippedAnswers = 0;
     private Random random = new Random();
+    private boolean translateToEnglish = true;
 
     public Map<String, String> getDictionary() {
         return this.dictionary;
@@ -74,10 +75,60 @@ public class DictionaryModel {
         if (currentIndex < shuffledWords.size()) {
             return shuffledWords.get(currentIndex++);
         }
-        return null; // No more words left to test
+        return null;
+    }
+
+    public String getNextWordLearning() {
+        if (currentIndex < shuffledWords.size()) {
+            String word = shuffledWords.get(currentIndex++);
+            translateToEnglish = !translateToEnglish; // tryb tłumaczenia
+            return word;
+        }
+        return null;
+    }
+
+    public boolean shouldTranslateToEnglish() {
+        return translateToEnglish;
     }
 
     public boolean isCorrectTranslation(String word, String userTranslation) {
+        String correctTranslation;
+
+        if (shouldTranslateToEnglish()) {
+            correctTranslation = dictionary.get(word); // Tłumaczenie z polskiego na angielski
+        } else {
+            correctTranslation = getKeyByValue(dictionary, word); // Tłumaczenie z angielskiego na polski
+        }
+
+        if (correctTranslation == null) {
+            return false; // Jeśli brak tłumaczenia, zwróć fałsz
+        }
+
+        boolean correct = correctTranslation.equalsIgnoreCase(userTranslation);
+        boolean inSkippedList = skippedWords.contains(word);
+
+        if (correct) {
+            if (inSkippedList) {
+                skippedAnswers--;
+            }
+            correctAnswers++;
+        } else {
+            incorrectAnswers++;
+        }
+
+        return correct;
+    }
+
+    public String getKeyByValue(Map<String, String> map, String value) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue().equalsIgnoreCase(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
         boolean correct = dictionary.get(word).equalsIgnoreCase(userTranslation);
         boolean inSkippedList = skippedWords.contains(word);
         if (correct) {
@@ -101,11 +152,6 @@ public class DictionaryModel {
     public void markAnswerAsCorrect() {
         correctAnswers++;
         incorrectAnswers = Math.max(0, incorrectAnswers - 1);
-    }
-
-    public void markSkippedAsCorrect() {
-        correctAnswers++;
-        --skippedAnswers;
     }
 
     public void resetProgress() {

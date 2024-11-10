@@ -140,9 +140,14 @@ public class DictionaryController {
     }
 
     public void continueLearning() {
-        String word = model.getNextWord(); // Using getNextWord() now
+        String word = model.getNextWordLearning();
         if (word != null) {
-            view.showLearningPanel(this, word);
+            if (model.shouldTranslateToEnglish()) {
+                view.showLearningPanel(this, word); // Domyślnie tłumaczenie na angielski
+            } else {
+                String translation = model.searchWord(word); // Znajduje polski odpowiednik
+                view.showLearningPanel(this, translation); // Pokazuje polskie tłumaczenie
+            }
         } else {
             endLearningSession();
         }
@@ -154,7 +159,10 @@ public class DictionaryController {
             view.showMessage("Poprawna odpowiedź", "Twoja odpowiedź jest poprawna!");
             continueLearning();
         } else {
-            String correctTranslation = model.searchWord(word);
+            String correctTranslation = model.shouldTranslateToEnglish()
+                    ? model.getDictionary().get(word)
+                    : model.getKeyByValue(model.getDictionary(), word);
+
             view.showIncorrectAnswerPanel(this, word, userTranslation, correctTranslation);
         }
     }
@@ -219,7 +227,7 @@ public class DictionaryController {
     }
 
     public void checkMatchingAnswer(String word, String selectedTranslation) {
-        boolean correct = model.isCorrectTranslation(word, selectedTranslation);
+        boolean correct = model.isCorrectTranslationMatching(word, selectedTranslation);
         if (correct) {
             view.showMessage("Poprawna odpowiedź", "Twoja odpowiedź jest poprawna!");
         } else {
