@@ -93,11 +93,6 @@ public class DictionaryView {
         guiScreen.getScreen().refresh();
     }
 
-    public void resetPagination() {
-        currentPage = 0;
-    }
-
-
     public void showMessage(String title, String message) {
         Window messageWindow = new Window(title);
         messageWindow.setWindowSizeOverride(new TerminalSize(31, 7));

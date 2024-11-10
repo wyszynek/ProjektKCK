@@ -86,6 +86,9 @@ public class DictionaryModel {
             }
             correctAnswers++;
         } else {
+            if(inSkippedList) {
+                skippedAnswers--;
+            }
             incorrectAnswers++;
         }
         return correct;

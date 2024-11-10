@@ -228,16 +228,4 @@ public class DictionaryController {
         }
         continueMatching();
     }
-
-    public void showAllWords() {
-        Map<String, String> allWords = model.getDictionary(); // Pobiera wszystkie słowa
-        StringBuilder wordList = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : allWords.entrySet()) {
-            wordList.append("Słówko: ").append(entry.getKey())
-                    .append(" - Tłumaczenie: ").append(entry.getValue())
-                    .append("\n");
-        }
-
-    }
 }
