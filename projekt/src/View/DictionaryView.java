@@ -6,12 +6,15 @@ import com.googlecode.lanterna.gui.Window;
 import com.googlecode.lanterna.gui.component.*;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class DictionaryView {
     private GUIScreen guiScreen;
     private Panel mainPanel;
+    private static final int WORDS_PER_PAGE = 10;  // Limit liczby słów na stronę
+    private int currentPage = 0;  // Numer bieżącej strony
 
     public DictionaryView(GUIScreen guiScreen) {
         this.guiScreen = guiScreen;
@@ -40,19 +43,60 @@ public class DictionaryView {
 
     public void showAllWordsPanel(Map<String, String> allWords, DictionaryController controller) {
         mainPanel.removeAllComponents();
-        if(allWords.isEmpty()) {
+
+        if (allWords.isEmpty()) {
             mainPanel.addComponent(new Label("Brak słówek w słowniku."));
             mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
-        }
-        else {
+        } else {
             mainPanel.addComponent(new Button("Wyszukaj słówko", controller::showSearchWordPanel));
             mainPanel.addComponent(new Button("Powrót", controller::showMainMenu));
-            for (Map.Entry<String, String> entry : allWords.entrySet()) {
+
+            // Konwertujemy Map na Listę dla łatwego dostępu przez indeks
+            List<Map.Entry<String, String>> wordsList = new ArrayList<>(allWords.entrySet());
+            int totalWords = wordsList.size();
+            int totalPages = (totalWords + WORDS_PER_PAGE - 1) / WORDS_PER_PAGE;
+
+            // Upewniamy się, że currentPage jest w zakresie
+            if (currentPage < 0) {
+                currentPage = 0;
+            } else if (currentPage >= totalPages) {
+                currentPage = totalPages - 1;
+            }
+
+            // Ustalamy zakres słów dla bieżącej strony
+            int startIndex = currentPage * WORDS_PER_PAGE;
+            int endIndex = Math.min(startIndex + WORDS_PER_PAGE, totalWords);
+
+            // Dodajemy słówka na bieżącej stronie do panelu
+            for (int i = startIndex; i < endIndex; i++) {
+                Map.Entry<String, String> entry = wordsList.get(i);
                 mainPanel.addComponent(new Label(entry.getKey() + " - " + entry.getValue()));
             }
-            guiScreen.getScreen().refresh();
+
+            // Panel nawigacji z przyciskami "Poprzednie" i "Następne"
+            Panel navigationPanel = new Panel();
+            if (currentPage > 0) {
+                navigationPanel.addComponent(new Button("Poprzednie", () -> {
+                    currentPage--;
+                    showAllWordsPanel(allWords, controller);  // Odświeżenie dla poprzedniej strony
+                }));
+            }
+            if (currentPage < totalPages - 1) {
+                navigationPanel.addComponent(new Button("Następne", () -> {
+                    currentPage++;
+                    showAllWordsPanel(allWords, controller);  // Odświeżenie dla następnej strony
+                }));
+            }
+            mainPanel.addComponent(navigationPanel);
         }
+
+        guiScreen.getScreen().refresh();
     }
+
+    public void resetPagination() {
+        currentPage = 0;
+    }
+
 
     public void showMessage(String title, String message) {
         Window messageWindow = new Window(title);
