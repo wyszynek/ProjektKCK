@@ -7,6 +7,7 @@ public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
     private List<String> shuffledWords = new ArrayList<>();
     private List<String> skippedWords = new ArrayList<>();
+    private List<String> skippedWordsAsMapValue = new ArrayList<>();
     private int currentIndex = 0;
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;
@@ -92,11 +93,13 @@ public class DictionaryModel {
     }
 
     public boolean isCorrectTranslation(String word, String userTranslation) {
-        String correctTranslation;
+        String correctTranslation = null;
 
-        if (shouldTranslateToEnglish()) {
+        if (dictionary.containsKey(word)) {
             correctTranslation = dictionary.get(word); // Tłumaczenie z polskiego na angielski
-        } else {
+        }
+        // Jeśli 'word' nie jest kluczem, sprawdzamy, czy jest wartością
+        else if (dictionary.containsValue(word)) {
             correctTranslation = getKeyByValue(dictionary, word); // Tłumaczenie z angielskiego na polski
         }
 
@@ -106,13 +109,17 @@ public class DictionaryModel {
 
         boolean correct = correctTranslation.equalsIgnoreCase(userTranslation);
         boolean inSkippedList = skippedWords.contains(word);
+        boolean inSkippedValue = skippedWordsAsMapValue.contains(word);
 
         if (correct) {
-            if (inSkippedList) {
+            if (inSkippedList || inSkippedValue) {
                 skippedAnswers--;
             }
             correctAnswers++;
         } else {
+            if(inSkippedList || inSkippedValue) {
+                skippedAnswers--;
+            }
             incorrectAnswers++;
         }
 
@@ -157,6 +164,7 @@ public class DictionaryModel {
     public void resetProgress() {
         currentIndex = 0;
         skippedWords.clear();
+        skippedWordsAsMapValue.clear();
         shuffledWords.clear();
         shuffledWords.addAll(dictionary.keySet());
         Collections.shuffle(shuffledWords, random);
@@ -179,6 +187,10 @@ public class DictionaryModel {
 
     public List<String> getSkippedWords() {
         return this.skippedWords;
+    }
+
+    public List<String> getSkippedWordsAsMapValue() {
+        return this.skippedWordsAsMapValue;
     }
 
     public List<String> getShuffledWords() {

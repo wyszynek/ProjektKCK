@@ -173,11 +173,21 @@ public class DictionaryController {
     }
 
     public void skipWord(String word) {
-        if (!model.getSkippedWords().contains(word)) {
-            model.increaseSkippedAnswers();
-            model.getSkippedWords().add(word);
-            model.getShuffledWords().add(word);
-            continueLearning();
+        if(!model.getSkippedWords().contains(word) && !model.getSkippedWordsAsMapValue().contains(word)) {
+            if(model.getDictionary().containsKey(word)) {
+                model.increaseSkippedAnswers();
+                model.getSkippedWords().add(word);
+                model.getShuffledWords().add(word);
+                continueLearning();
+            }
+            else if(model.getDictionary().containsValue(word)) {
+                String translate = model.searchWord(word);
+                model.increaseSkippedAnswers();
+                model.getSkippedWordsAsMapValue().add(word);
+                model.getSkippedWords().add(translate);
+                model.getShuffledWords().add(translate);
+                continueLearning();
+            }
         } else {
             String correctTranslation = model.searchWord(word);
             view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to: " + correctTranslation);
