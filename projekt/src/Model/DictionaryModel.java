@@ -43,10 +43,6 @@ public class DictionaryModel {
         return false;
     }
 
-    public boolean wordExists(String word) {
-        return dictionary.containsKey(word);
-    }
-
     public String searchWord(String word) {
         // Najpierw sprawdzamy, czy 'word' jest kluczem w słowniku
         String translation = dictionary.get(word);
@@ -70,13 +66,6 @@ public class DictionaryModel {
     public void shuffleWords() {
         Collections.shuffle(shuffledWords, random);
         currentIndex = 0; // Reset the current index to start from the beginning after shuffling
-    }
-
-    public String getNextWord() {
-        if (currentIndex < shuffledWords.size()) {
-            return shuffledWords.get(currentIndex++);
-        }
-        return null;
     }
 
     public String getNextWordLearning() {
@@ -133,23 +122,6 @@ public class DictionaryModel {
             }
         }
         return null;
-    }
-
-    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
-        boolean correct = dictionary.get(word).equalsIgnoreCase(userTranslation);
-        boolean inSkippedList = skippedWords.contains(word);
-        if (correct) {
-            if(inSkippedList) {
-                skippedAnswers--;
-            }
-            correctAnswers++;
-        } else {
-            if(inSkippedList) {
-                skippedAnswers--;
-            }
-            incorrectAnswers++;
-        }
-        return correct;
     }
 
     public void increaseSkippedAnswers() {
@@ -215,6 +187,30 @@ public class DictionaryModel {
 
         Collections.shuffle(options); // Mieszamy opcje, aby poprawna nie zawsze była na pierwszej pozycji
         return options;
+    }
+
+    public String getNextWord() {
+        if (currentIndex < shuffledWords.size()) {
+            return shuffledWords.get(currentIndex++);
+        }
+        return null;
+    }
+
+    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
+        boolean correct = dictionary.get(word).equalsIgnoreCase(userTranslation);
+        boolean inSkippedList = skippedWords.contains(word);
+        if (correct) {
+            if(inSkippedList) {
+                skippedAnswers--;
+            }
+            correctAnswers++;
+        } else {
+            if(inSkippedList) {
+                skippedAnswers--;
+            }
+            incorrectAnswers++;
+        }
+        return correct;
     }
 
     public void saveDictionary(String fileName) throws IOException {

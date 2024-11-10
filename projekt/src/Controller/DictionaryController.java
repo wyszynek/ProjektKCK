@@ -52,7 +52,7 @@ public class DictionaryController {
     }
 
     public void addWord(String word, String translation) {
-        if (model.wordExists(word)) {
+        if (model.getDictionary().containsKey(word)) {
             view.showMessage("Błąd", "Słówko '" + word + "' już istnieje \nw słowniku.");
         } else if (!word.isEmpty() && !translation.isEmpty()) {
             model.addWord(word, translation);
@@ -81,52 +81,6 @@ public class DictionaryController {
             view.showMessage("Nie znaleziono", "Słówko '" + word + "'\nnie zostało znalezione.");
         }
         showMainMenu();
-    }
-
-    public void saveDictionary() {
-        String fileName = promptFileName("Zapisz słownik", "Podaj nazwę pliku:");
-        if (!fileName.isEmpty()) {
-            try {
-                model.saveDictionary(fileName);
-                view.showMessage("Zapisano", "Słownik został zapisany \ndo pliku: " + fileName);
-            } catch (IOException e) {
-                view.showMessage("Błąd zapisu", "Nie udało się zapisać \nsłownika do pliku: " + fileName);
-            }
-        }
-    }
-
-    public void loadDictionary() {
-        String fileName = promptFileName("Wczytaj słownik", "Podaj nazwę pliku \ndo wczytania:");
-        if (!fileName.isEmpty()) {
-            try {
-                model.loadDictionary(fileName);
-                view.showMessage("Wczytano", "Słownik został wczytany \nz pliku: " + fileName);
-            } catch (IOException e) {
-                view.showMessage("Błąd odczytu", "Nie udało się wczytać \nsłownika z pliku: " + fileName);
-            }
-        }
-    }
-
-    public String promptFileName(String windowTitle, String promptText) {
-        final String[] fileName = {""};
-        Window fileNameWindow = new Window(windowTitle);
-        fileNameWindow.setWindowSizeOverride(new TerminalSize(30, 10));
-
-        Panel panel = new Panel();
-        panel.addComponent(new Label(promptText));
-        TextBox fileNameInput = new TextBox();
-        panel.addComponent(fileNameInput);
-
-        panel.addComponent(new Button("OK", () -> {
-            fileName[0] = fileNameInput.getText();
-            fileNameWindow.close();
-        }));
-        panel.addComponent(new Button("Anuluj", fileNameWindow::close));
-
-        fileNameWindow.addComponent(panel);
-        view.getGuiScreen().showWindow(fileNameWindow, GUIScreen.Position.CENTER);
-
-        return fileName[0];
     }
 
     public void startLearningMode() {
@@ -245,5 +199,51 @@ public class DictionaryController {
             view.showMessage("Niepoprawna odpowiedź", "Poprawna odpowiedź to:\n" + correctTranslation);
         }
         continueMatching();
+    }
+
+    public void saveDictionary() {
+        String fileName = promptFileName("Zapisz słownik", "Podaj nazwę pliku:");
+        if (!fileName.isEmpty()) {
+            try {
+                model.saveDictionary(fileName);
+                view.showMessage("Zapisano", "Słownik został zapisany \ndo pliku: " + fileName);
+            } catch (IOException e) {
+                view.showMessage("Błąd zapisu", "Nie udało się zapisać \nsłownika do pliku: " + fileName);
+            }
+        }
+    }
+
+    public void loadDictionary() {
+        String fileName = promptFileName("Wczytaj słownik", "Podaj nazwę pliku \ndo wczytania:");
+        if (!fileName.isEmpty()) {
+            try {
+                model.loadDictionary(fileName);
+                view.showMessage("Wczytano", "Słownik został wczytany \nz pliku: " + fileName);
+            } catch (IOException e) {
+                view.showMessage("Błąd odczytu", "Nie udało się wczytać \nsłownika z pliku: " + fileName);
+            }
+        }
+    }
+
+    public String promptFileName(String windowTitle, String promptText) {
+        final String[] fileName = {""};
+        Window fileNameWindow = new Window(windowTitle);
+        fileNameWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+
+        Panel panel = new Panel();
+        panel.addComponent(new Label(promptText));
+        TextBox fileNameInput = new TextBox();
+        panel.addComponent(fileNameInput);
+
+        panel.addComponent(new Button("OK", () -> {
+            fileName[0] = fileNameInput.getText();
+            fileNameWindow.close();
+        }));
+        panel.addComponent(new Button("Anuluj", fileNameWindow::close));
+
+        fileNameWindow.addComponent(panel);
+        view.getGuiScreen().showWindow(fileNameWindow, GUIScreen.Position.CENTER);
+
+        return fileName[0];
     }
 }
