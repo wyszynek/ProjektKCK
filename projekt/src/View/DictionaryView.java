@@ -32,9 +32,10 @@ public class DictionaryView {
         mainPanel.addComponent(new Button("Lista słówek", controller::showAllWordsPanel));
         mainPanel.addComponent(new Button("Zapisz słownik", controller::saveDictionary));
         mainPanel.addComponent(new Button("Wczytaj słownik", controller::loadDictionary));
+        mainPanel.addComponent(new EmptySpace());
         mainPanel.addComponent(new Button("Wyjście", controller::exit));
 
-        Window mainWindow = new Window("Fiszkoteka");
+        Window mainWindow = new Window("Fishki");
         mainWindow.setWindowSizeOverride(new TerminalSize(40, 15));
         mainWindow.setSoloWindow(true);
         mainWindow.addComponent(mainPanel);
@@ -129,7 +130,8 @@ public class DictionaryView {
     public void showAddWordPanel(DictionaryController controller) {
         mainPanel.removeAllComponents();
         mainPanel.addComponent(new Label("Dodaj nowe słówko"));
-        mainPanel.addComponent(new Label("Podaj słówko (ang):"));
+        mainPanel.addComponent(new EmptySpace());
+        mainPanel.addComponent(new Label("Podaj słówko:"));
         TextBox wordInput = new TextBox();
         mainPanel.addComponent(wordInput);
         mainPanel.addComponent(new Label("Podaj tłumaczenie:"));
@@ -145,7 +147,8 @@ public class DictionaryView {
     public void showDeletionWordPanel(DictionaryController controller) {
         mainPanel.removeAllComponents();
         mainPanel.addComponent(new Label("Usuwanie słówka"));
-        mainPanel.addComponent(new Label("Podaj słówko do usunięcia (ang/pl):"));
+        mainPanel.addComponent(new EmptySpace());
+        mainPanel.addComponent(new Label("Podaj słówko do usunięcia:"));
         TextBox wordInput = new TextBox();
         mainPanel.addComponent(wordInput);
 
@@ -157,7 +160,8 @@ public class DictionaryView {
     public void showSearchWordPanel(DictionaryController controller) {
         mainPanel.removeAllComponents();
         mainPanel.addComponent(new Label("Wyszukaj słówko"));
-        mainPanel.addComponent(new Label("Podaj słówko (ang/pol):"));
+        mainPanel.addComponent(new EmptySpace());
+        mainPanel.addComponent(new Label("Podaj słówko:"));
         TextBox searchInput = new TextBox();
         mainPanel.addComponent(searchInput);
 
@@ -196,15 +200,15 @@ public class DictionaryView {
         guiScreen.getScreen().refresh();
     }
 
-    public void showResults(int correct, int incorrect, int skipped) {
+    public void showResults(int correct, int incorrect, int skipped, int allWords) {
         Window resultsWindow = new Window("Wyniki nauki");
-        resultsWindow.setWindowSizeOverride(new TerminalSize(30, 10));
+        resultsWindow.setWindowSizeOverride(new TerminalSize(32, 10));
 
         Panel panel = new Panel();
         panel.addComponent(new Label("Wyniki sesji:"));
-        panel.addComponent(new Label("Poprawne odpowiedzi: " + correct));
-        panel.addComponent(new Label("Niepoprawne odpowiedzi: " + incorrect));
-        panel.addComponent(new Label("Pominięte odpowiedzi: " + skipped));
+        panel.addComponent(new Label("Poprawne odpowiedzi: " + correct + "/" + allWords));
+        panel.addComponent(new Label("Niepoprawne odpowiedzi: " + incorrect  + "/" + allWords));
+        panel.addComponent(new Label("Pominięte odpowiedzi: " + skipped  + "/" + allWords));
         panel.addComponent(new Button("OK", resultsWindow::close));
 
         resultsWindow.addComponent(panel);

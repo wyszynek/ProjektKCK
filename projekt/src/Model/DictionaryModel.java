@@ -65,7 +65,7 @@ public class DictionaryModel {
 
     public void shuffleWords() {
         Collections.shuffle(shuffledWords, random);
-        currentIndex = 0; // Reset the current index to start from the beginning after shuffling
+        currentIndex = 0; // Resetujemy bieżący indeks, aby po przetasowaniu zaczął zaczynać się od początku
     }
 
     public String getNextWordLearning() {
@@ -93,7 +93,7 @@ public class DictionaryModel {
         }
 
         if (correctTranslation == null) {
-            return false; // Jeśli brak tłumaczenia, zwróć fałsz
+            return false; // Brak tłumaczenia
         }
 
         boolean correct = correctTranslation.equalsIgnoreCase(userTranslation);

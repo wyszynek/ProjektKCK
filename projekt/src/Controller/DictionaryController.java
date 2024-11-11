@@ -47,16 +47,17 @@ public class DictionaryController {
     }
 
     public void showAllWordsPanel() {
-        Map<String, String> allWords = model.getDictionary(); // Pobiera wszystkie słowa
+        Map<String, String> allWords = model.getDictionary();
         view.showAllWordsPanel(allWords, this);
     }
 
     public void addWord(String word, String translation) {
-        if (model.getDictionary().containsKey(word)) {
+        if (model.getDictionary().containsKey(word) || (model.getDictionary().containsKey(translation) &&
+                model.getDictionary().get(translation).equals(word))) {
             view.showMessage("Błąd", "Słówko '" + word + "' już istnieje \nw słowniku.");
         } else if (!word.isEmpty() && !translation.isEmpty()) {
             model.addWord(word, translation);
-            view.showMessage("Dodano słówko", "Słówko '" + word + "' zostało dodane.");
+            view.showMessage("Dodano słówko", "Słówko '" + word + "'\nzostało dodane.");
         } else {
             view.showMessage("Błąd", "Podano nieprawidłowe \nsłówko lub tłumaczenie.");
         }
@@ -144,7 +145,7 @@ public class DictionaryController {
             }
         } else {
             String correctTranslation = model.searchWord(word);
-            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to: " + correctTranslation);
+            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to:\n" + correctTranslation);
             continueLearning();
         }
     }
@@ -157,7 +158,7 @@ public class DictionaryController {
             continueMatching();
         } else {
             String correctTranslation = model.searchWord(word);
-            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to: " + correctTranslation);
+            view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to:\n" + correctTranslation);
             continueMatching();
         }
     }
@@ -166,7 +167,8 @@ public class DictionaryController {
         int correct = model.getCorrectAnswers();
         int incorrect = model.getIncorrectAnswers();
         int skipped = model.getSkippedAnswers();
-        view.showResults(correct, incorrect, skipped);
+        int allWords = model.getDictionary().size();
+        view.showResults(correct, incorrect, skipped, allWords);
         showMainMenu();
     }
 
