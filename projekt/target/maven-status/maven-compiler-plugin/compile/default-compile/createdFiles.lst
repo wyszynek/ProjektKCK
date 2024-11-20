@@ -1,0 +1,6 @@
+Model\DictionaryModel.class
+View\DictionaryView.class
+HelloController.class
+Controller\DictionaryController.class
+MainJavaFX.class
+MainLanterna.class
