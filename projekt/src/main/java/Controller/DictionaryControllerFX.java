@@ -1,11 +1,10 @@
 package Controller;
 
 import Model.DictionaryModel;
-import View.FX.AddWordView;
-import View.FX.MainMenuView;
-import View.FX.WelcomeView;
-import View.FX.WordListView;
+import View.FX.*;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class DictionaryControllerFX {
     private Stage stage;
@@ -36,6 +35,11 @@ public class DictionaryControllerFX {
         view.show();
     }
 
+    public void showSaveDictionaryView() {
+        SaveDictionaryView view = new SaveDictionaryView(stage, this);
+        view.show();
+    }
+
     // Logika obsługi dodawania słówka
     public void addWord(String word, String translation) {
         if (word.isBlank() || translation.isBlank()) {
@@ -43,5 +47,14 @@ public class DictionaryControllerFX {
             return;
         }
         model.addWord(word, translation);
+    }
+
+    public void saveDictionaryToFile(String fileName) {
+        try {
+            model.saveDictionary(fileName);
+            System.out.println("Słownik zapisano do pliku: " + fileName);
+        } catch (IOException e) {
+            System.out.println("Błąd zapisu słownika: " + e.getMessage());
+        }
     }
 }
