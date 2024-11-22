@@ -11,6 +11,7 @@ public class AddWordView {
     private Stage stage;
     private DictionaryControllerFX controller;
 
+    private VBox layout;
     private TextField wordField;
     private TextField translationField;
     private Button saveButton;
@@ -19,6 +20,9 @@ public class AddWordView {
     public AddWordView(Stage stage, DictionaryControllerFX controller) {
         this.stage = stage;
         this.controller = controller;
+
+        layout = new VBox(10);
+        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         // Tworzymy elementy UI tylko raz
         wordField = new TextField();
@@ -32,9 +36,6 @@ public class AddWordView {
     }
 
     public void show() {
-        VBox layout = new VBox(10);
-        layout.setStyle("-fx-padding: 20;");
-
         saveButton.setOnAction(e -> {
             // Dodajemy słowo i tłumaczenie
             controller.addWord(wordField.getText(), translationField.getText());

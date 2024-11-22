@@ -40,6 +40,11 @@ public class DictionaryControllerFX {
         view.show();
     }
 
+    public void loadSaveDictionaryView() {
+        LoadDictionaryView view = new LoadDictionaryView(stage, this);
+        view.show();
+    }
+
     // Logika obsługi dodawania słówka
     public void addWord(String word, String translation) {
         if (word.isBlank() || translation.isBlank()) {
@@ -55,6 +60,15 @@ public class DictionaryControllerFX {
             System.out.println("Słownik zapisano do pliku: " + fileName);
         } catch (IOException e) {
             System.out.println("Błąd zapisu słownika: " + e.getMessage());
+        }
+    }
+
+    public void loadDictionaryFromFile(String fileName) {
+        try {
+            model.loadDictionary(fileName);
+            System.out.println("Słownik wczytano z pliku: " + fileName);
+        } catch (IOException e) {
+            System.out.println("Błąd wczytywania słownika: " + e.getMessage());
         }
     }
 }
