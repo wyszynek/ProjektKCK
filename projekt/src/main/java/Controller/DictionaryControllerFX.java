@@ -85,7 +85,18 @@ public class DictionaryControllerFX {
     }
 
     public String getNextWord() {
-        return model.getNextWordLearning();
+        String word = model.getNextWordLearning();
+        if (word != null) {
+            if (model.shouldTranslateToEnglish()) {
+                return word;
+            } else {
+                String translation = model.searchWord(word); // Znajduje polski odpowiednik
+                return translation;
+            }
+        } else {
+            getLearningStatistics();
+        }
+        return null;
     }
     public void skipWord(String word) {
         if(!model.getSkippedWords().contains(word) && !model.getSkippedWordsAsMapValue().contains(word)) {
@@ -101,17 +112,11 @@ public class DictionaryControllerFX {
                 model.getSkippedWords().add(translate);
                 model.getShuffledWords().add(translate);
             }
-        } else {
-            String correctTranslation = model.searchWord(word);
         }
     }
 
     public boolean checkAnswer(String word, String translation) {
         return model.isCorrectTranslation(word, translation);
-    }
-
-    public boolean shouldTranslateToEnglish() {
-        return model.shouldTranslateToEnglish();
     }
 
     public Map<String, Integer> getLearningStatistics() {
