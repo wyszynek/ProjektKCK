@@ -5,6 +5,12 @@ import java.util.*;
 
 public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
+    private Map<String, String> skippedWordsMap = new HashMap<>();
+
+    public Map<String, String> getSkippedWordsMap() {
+        return this.skippedWordsMap;
+    }
+
     private List<String> shuffledWords = new ArrayList<>();
     private List<String> skippedWords = new ArrayList<>();
     private List<String> skippedWordsAsMapValue = new ArrayList<>();
@@ -135,6 +141,7 @@ public class DictionaryModel {
 
     public void resetProgress() {
         currentIndex = 0;
+        getSkippedWordsMap().clear();
         skippedWords.clear();
         skippedWordsAsMapValue.clear();
         shuffledWords.clear();
