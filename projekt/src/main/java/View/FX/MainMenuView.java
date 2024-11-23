@@ -23,15 +23,17 @@ public class MainMenuView {
         Button wordListButton = new Button("Lista słówek");
         Button saveDictionaryButton = new Button("Zapisz słownik");
         Button loadDictionaryButton = new Button("Wczytaj słownik");
+        Button learnButton = new Button("Tryb Nauki");
         Button exitButton = new Button("Wyjdź");
 
         addWordButton.setOnAction(e -> controller.showAddWordView());
         wordListButton.setOnAction(e -> controller.showWordListView());
         saveDictionaryButton.setOnAction(e -> controller.showSaveDictionaryView());
         loadDictionaryButton.setOnAction(e -> controller.loadSaveDictionaryView());
+        learnButton.setOnAction(e -> controller.startLearning());
         exitButton.setOnAction(e -> stage.close());
 
-        layout.getChildren().addAll(addWordButton, wordListButton, saveDictionaryButton, loadDictionaryButton, exitButton);
+        layout.getChildren().addAll(addWordButton, wordListButton, saveDictionaryButton, loadDictionaryButton, learnButton, exitButton);
 
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);

@@ -5,6 +5,8 @@ import View.FX.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DictionaryControllerFX {
     private Stage stage;
@@ -45,6 +47,16 @@ public class DictionaryControllerFX {
         view.show();
     }
 
+    public void startLearning() {
+        model.resetProgress(); // Resetujemy stan nauki
+        showLearningView();    // Przechodzimy do widoku nauki
+    }
+
+    private void showLearningView() {
+        LearnWordView view = new LearnWordView(stage, this);
+        view.show();
+    }
+
     // Logika obsługi dodawania słówka
     public void addWord(String word, String translation) {
         if (word.isBlank() || translation.isBlank()) {
@@ -70,5 +82,44 @@ public class DictionaryControllerFX {
         } catch (IOException e) {
             System.out.println("Błąd wczytywania słownika: " + e.getMessage());
         }
+    }
+
+    public String getNextWord() {
+        return model.getNextWordLearning();
+    }
+    public void skipWord(String word) {
+        if(!model.getSkippedWords().contains(word) && !model.getSkippedWordsAsMapValue().contains(word)) {
+            if(model.getDictionary().containsKey(word)) {
+                model.increaseSkippedAnswers();
+                model.getSkippedWords().add(word);
+                model.getShuffledWords().add(word);
+            }
+            else if(model.getDictionary().containsValue(word)) {
+                String translate = model.searchWord(word);
+                model.increaseSkippedAnswers();
+                model.getSkippedWordsAsMapValue().add(word);
+                model.getSkippedWords().add(translate);
+                model.getShuffledWords().add(translate);
+            }
+        } else {
+            String correctTranslation = model.searchWord(word);
+        }
+    }
+
+    public boolean checkAnswer(String word, String translation) {
+        return model.isCorrectTranslation(word, translation);
+    }
+
+    public boolean shouldTranslateToEnglish() {
+        return model.shouldTranslateToEnglish();
+    }
+
+    public Map<String, Integer> getLearningStatistics() {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("Correct", model.getCorrectAnswers());
+        stats.put("Incorrect", model.getIncorrectAnswers());
+        stats.put("Skipped", model.getSkippedAnswers());
+        stats.put("Total", model.getDictionary().size());
+        return stats;
     }
 }
