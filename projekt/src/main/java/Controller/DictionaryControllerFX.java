@@ -127,4 +127,8 @@ public class DictionaryControllerFX {
         stats.put("Total", model.getDictionary().size());
         return stats;
     }
+
+    public void removeWord(String selectedWord) {
+        model.removeWord(selectedWord);
+    }
 }

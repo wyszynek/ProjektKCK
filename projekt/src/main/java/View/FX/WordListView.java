@@ -15,6 +15,7 @@ public class WordListView {
     private Stage stage;
     private DictionaryControllerFX controller;
     private ObservableList<String> words;
+    private ListView<String> wordList;
 
     public WordListView(Stage stage, DictionaryControllerFX controller, Map<String, String> dictionary) {
         this.stage = stage;
@@ -35,7 +36,7 @@ public class WordListView {
         TextField searchField = new TextField();
         searchField.setPromptText("Wyszukaj słówko");
 
-        ListView<String> wordList = new ListView<>();
+        wordList = new ListView<>();
         wordList.setItems(words);
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -46,14 +47,38 @@ public class WordListView {
             ));
         });
 
+        // Przycisk "Usuń" (początkowo nieaktywny)
+        Button deleteButton = new Button("Usuń");
+        deleteButton.setDisable(true); // Początkowo przycisk jest zablokowany
+
+        // Aktywacja przycisku "Usuń" po zaznaczeniu słowa
+        wordList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                deleteButton.setDisable(false); // Aktywuj przycisk, gdy wybrane jest słowo
+            }
+        });
+
+        // Akcja usuwania słowa po kliknięciu "Usuń"
+        deleteButton.setOnAction(e -> {
+            String selectedWord = wordList.getSelectionModel().getSelectedItem();
+            String wordToDelete = selectedWord.split(" - ")[0]; // Wyciągamy słowo przed myślnikiem
+
+            // Usuwamy słowo z słownika
+            controller.removeWord(wordToDelete);
+
+            // Usuwamy je z ObservableList, co spowoduje automatyczne odświeżenie widoku listy
+            words.remove(selectedWord);
+
+            deleteButton.setDisable(true); // Zablokuj przycisk po usunięciu słowa
+        });
+
         Button backButton = new Button("Powrót");
         backButton.setOnAction(e -> controller.showMainMenu());
 
-        layout.getChildren().addAll(searchField, wordList, backButton);
+        layout.getChildren().addAll(searchField, wordList, deleteButton, backButton);
 
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
         stage.setTitle("Lista słówek");
     }
 }
-
