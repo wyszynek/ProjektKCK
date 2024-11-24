@@ -6,14 +6,8 @@ import java.util.*;
 public class DictionaryModel {
     private Map<String, String> dictionary = new HashMap<>();
     private Map<String, String> skippedWordsMap = new HashMap<>();
-
-    public Map<String, String> getSkippedWordsMap() {
-        return this.skippedWordsMap;
-    }
-
     private List<String> shuffledWords = new ArrayList<>();
     private List<String> skippedWords = new ArrayList<>();
-    private List<String> skippedWordsAsMapValue = new ArrayList<>();
     private int currentIndex = 0;
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;
@@ -23,6 +17,10 @@ public class DictionaryModel {
 
     public Map<String, String> getDictionary() {
         return this.dictionary;
+    }
+
+    public Map<String, String> getSkippedWordsMap() {
+        return this.skippedWordsMap;
     }
 
     public void addWord(String word, String translation) {
@@ -103,16 +101,15 @@ public class DictionaryModel {
         }
 
         boolean correct = correctTranslation.equalsIgnoreCase(userTranslation);
-        boolean inSkippedList = skippedWords.contains(word);
-        boolean inSkippedValue = skippedWordsAsMapValue.contains(word);
+        String translation = searchWord(word);
 
         if (correct) {
-            if (inSkippedList || inSkippedValue) {
+            if (getSkippedWordsMap().containsKey(word) || getSkippedWordsMap().containsKey(translation)) {
                 skippedAnswers--;
             }
             correctAnswers++;
         } else {
-            if(inSkippedList || inSkippedValue) {
+            if(getSkippedWordsMap().containsKey(word) || getSkippedWordsMap().containsKey(translation)) {
                 skippedAnswers--;
             }
             incorrectAnswers++;
@@ -143,7 +140,6 @@ public class DictionaryModel {
         currentIndex = 0;
         getSkippedWordsMap().clear();
         skippedWords.clear();
-        skippedWordsAsMapValue.clear();
         shuffledWords.clear();
         shuffledWords.addAll(dictionary.keySet());
         Collections.shuffle(shuffledWords, random);
@@ -166,10 +162,6 @@ public class DictionaryModel {
 
     public List<String> getSkippedWords() {
         return this.skippedWords;
-    }
-
-    public List<String> getSkippedWordsAsMapValue() {
-        return this.skippedWordsAsMapValue;
     }
 
     public List<String> getShuffledWords() {

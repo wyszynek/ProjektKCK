@@ -114,11 +114,14 @@ public class DictionaryController {
             view.showMessage("Poprawna odpowiedź", "Twoja odpowiedź jest poprawna!");
             continueLearning();
         } else {
-            String correctTranslation = model.shouldTranslateToEnglish()
-                    ? model.getDictionary().get(word)
-                    : model.getKeyByValue(model.getDictionary(), word);
-
-            view.showIncorrectAnswerPanel(this, word, userTranslation, correctTranslation);
+            if(model.getDictionary().containsKey(word)) {
+                String correctTranslation = model.searchWord(word);
+                view.showIncorrectAnswerPanel(this, word, userTranslation, correctTranslation);
+            }
+            else if(model.getDictionary().containsValue(word)) {
+                String correctTranslation = model.searchWord(word);
+                view.showIncorrectAnswerPanel(this, word, userTranslation, correctTranslation);
+            }
         }
     }
 
@@ -128,21 +131,14 @@ public class DictionaryController {
     }
 
     public void skipWord(String word) {
-        if(!model.getSkippedWords().contains(word) && !model.getSkippedWordsAsMapValue().contains(word)) {
-            if(model.getDictionary().containsKey(word)) {
-                model.increaseSkippedAnswers();
-                model.getSkippedWords().add(word);
-                model.getShuffledWords().add(word);
-                continueLearning();
-            }
-            else if(model.getDictionary().containsValue(word)) {
-                String translate = model.searchWord(word);
-                model.increaseSkippedAnswers();
-                model.getSkippedWordsAsMapValue().add(word);
-                model.getSkippedWords().add(translate);
-                model.getShuffledWords().add(translate);
-                continueLearning();
-            }
+        String translation = model.searchWord(word);
+        if((!model.getSkippedWordsMap().containsKey(word) || !model.getSkippedWordsMap().containsKey(translation))) {
+            model.increaseSkippedAnswers();
+            model.getSkippedWordsMap().put(word, translation);
+            model.getSkippedWordsMap().put(translation, word);
+            model.getSkippedWords().add(word);
+            model.getShuffledWords().add(word);
+            continueLearning();
         } else {
             String correctTranslation = model.searchWord(word);
             view.showMessage("Ponowne pominięcie", "Poprawna odpowiedź to:\n" + correctTranslation);
