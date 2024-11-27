@@ -232,4 +232,21 @@ public class DictionaryModel {
             }
         }
     }
+
+//    public List<String> generateMatchingOptions(String correctAnswer, int numberOfOptions) {
+//        List<String> options = new ArrayList<>();
+//        options.add(correctAnswer); // Dodaj poprawną odpowiedź
+//
+//        // Pobierz wszystkie tłumaczenia lub słowa, w zależności od kontekstu
+//        List<String> allOptions = new ArrayList<>(dictionary.values());
+//        allOptions.remove(correctAnswer); // Usuń poprawną odpowiedź
+//
+//        Collections.shuffle(allOptions); // Wymieszaj
+//        for (int i = 0; i < numberOfOptions - 1 && i < allOptions.size(); i++) {
+//            options.add(allOptions.get(i));
+//        }
+//
+//        Collections.shuffle(options); // Ponowne mieszanie, aby poprawna odpowiedź nie była zawsze na początku
+//        return options;
+//    }
 }

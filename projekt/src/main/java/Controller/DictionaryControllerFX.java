@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DictionaryControllerFX {
@@ -84,7 +85,7 @@ public class DictionaryControllerFX {
         }
     }
 
-    public String getNextWord() {
+    public String continueLearning() {
         String word = model.getNextWordLearning();
         if (word != null) {
             if (model.shouldTranslateToEnglish()) {
@@ -125,5 +126,37 @@ public class DictionaryControllerFX {
 
     public void removeWord(String selectedWord) {
         model.removeWord(selectedWord);
+    }
+
+    public void startMatching() {
+        model.resetProgress();
+        showMatchingView();
+    }
+
+    private void showMatchingView() {
+        LearnMatchingView view = new LearnMatchingView(stage, this);
+        view.show();
+    }
+
+    public String continueMatching() {
+        return model.getNextWord();
+    }
+
+    // Pobiera opcje tłumaczenia (tłumaczenie poprawne + losowe opcje)
+    public List<String> getMatchingOptions(String word, int numberOfOptions) {
+        return model.getMatchingOptions(word, numberOfOptions);
+    }
+
+    // Sprawdza, czy odpowiedź użytkownika jest poprawna
+    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
+        return model.isCorrectTranslationMatching(word, userTranslation);
+    }
+
+    public void skipWord2(String word) {
+        if (!model.getSkippedWords().contains(word)) {
+            model.increaseSkippedAnswers();
+            model.getSkippedWords().add(word);
+            model.getShuffledWords().add(word);
+        }
     }
 }
