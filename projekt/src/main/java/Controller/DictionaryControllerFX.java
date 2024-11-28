@@ -67,6 +67,17 @@ public class DictionaryControllerFX {
         model.addWord(word, translation);
     }
 
+    public boolean checkIfExists(String word, String translation) {
+        if (model.getDictionary().containsKey(word) || (model.getDictionary().containsKey(translation) &&
+                model.getDictionary().get(translation).equals(word))) {
+            return false;
+        } else if (!word.isEmpty() && !translation.isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public void saveDictionaryToFile(String fileName) {
         try {
             model.saveDictionary(fileName);
