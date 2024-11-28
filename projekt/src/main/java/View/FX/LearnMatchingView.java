@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,15 @@ public class LearnMatchingView {
 
         layout.getChildren().addAll(wordLabel, optionsLayout, feedbackLabel, checkButton, skipButton, nextButton, backButton);
 
-        Scene scene = new Scene(layout, 400, 350);
+        Scene scene = new Scene(layout, 500, 400);
+
+        URL resource = getClass().getResource("/matching-style.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
         stage.setScene(scene);
         stage.setTitle("Tryb Nauki przez Dopasowanie");
 

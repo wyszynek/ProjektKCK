@@ -52,7 +52,7 @@ public class SaveDictionaryView {
 
         layout.getChildren().addAll(instructionLabel, fileNameField, saveButton, backButton);
 
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 500, 400);
         stage.setScene(scene);
         stage.setTitle("Zapisz słownik");
     }

@@ -57,7 +57,7 @@ public class LoadDictionaryView {
 
         layout.getChildren().addAll(instructionLabel, fileNameField, loadButton, backButton);
 
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 500, 400);
         stage.setScene(scene);
         stage.setTitle("Wczytaj słownik");
     }

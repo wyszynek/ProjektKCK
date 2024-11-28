@@ -50,7 +50,7 @@ public class LearnWordView {
 
         layout.getChildren().addAll(wordLabel, translationField, feedbackLabel, checkButton, skipButton, nextButton, backButton);
 
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 500, 400);
         stage.setScene(scene);
         stage.setTitle("Tryb Nauki");
 
@@ -104,7 +104,7 @@ public class LearnWordView {
 
         statsLayout.getChildren().addAll(titleLabel, correctLabel, incorrectLabel, skippedLabel, backButton);
 
-        Scene statsScene = new Scene(statsLayout, 400, 300);
+        Scene statsScene = new Scene(statsLayout, 500, 400);
         stage.setScene(statsScene);
     }
 }

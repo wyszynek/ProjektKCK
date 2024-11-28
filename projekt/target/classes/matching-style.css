@@ -1,0 +1,66 @@
+/* Global Styles */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-base: #ffffff;
+    -fx-background-color: #f4f4f4;
+    -fx-background-color: linear-gradient(to right, #3498db, #2ecc71); /* Przechodzi od niebieskiego do zielonego */
+}
+
+/* Labels and Titles */
+.label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* Word label (for the word to be translated) */
+#wordLabel {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10px;
+}
+
+/* Feedback label (correct/incorrect) */
+#feedbackLabel {
+    -fx-font-size: 14px;
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+}
+
+/* Button Styling */
+.button {
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+/* Disabled buttons */
+.button:disabled {
+    -fx-background-color: #bdc3c7;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* VBox Layout for radio buttons */
+.vbox {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
+
+/* Radio Button Styling */
+.radio-button {
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+    -fx-text-fill: #2c3e50;
+}

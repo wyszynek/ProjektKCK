@@ -22,7 +22,7 @@ public class WelcomeView {
         continueButton.setOnAction(e -> controller.showMainMenu());
 
         layout.getChildren().add(continueButton);
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 500, 400);
         stage.setScene(scene);
         stage.setTitle("Witamy w aplikacji słownikowej!");
         stage.show();

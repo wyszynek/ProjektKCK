@@ -7,6 +7,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.net.URL;
+
 public class AddWordView {
     private Stage stage;
     private DictionaryControllerFX controller;
@@ -50,7 +52,15 @@ public class AddWordView {
         layout.getChildren().addAll(wordField, translationField, saveButton, backButton);
 
         // Scena jest ustawiana tylko raz
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 500, 400);
+
+        URL resource = getClass().getResource("/addword-style.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
         stage.setScene(scene);
         stage.setTitle("Dodaj słówko");
     }
