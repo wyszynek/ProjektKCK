@@ -3,6 +3,7 @@ package View.FX;
 import Controller.DictionaryControllerFX;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -36,6 +37,14 @@ public class MainMenuView {
         learnButton.setOnAction(e -> controller.startLearning());
         matchingButton.setOnAction(e -> controller.startMatching());
         exitButton.setOnAction(e -> stage.close());
+
+        if(controller.unlockMatching() == false) {
+            matchingButton.setDisable(true);
+        }
+
+        if(controller.unlockLearning() == false) {
+            learnButton.setDisable(true);
+        }
 
         layout.getChildren().addAll(addWordButton, wordListButton, saveDictionaryButton, loadDictionaryButton, learnButton, matchingButton, exitButton);
 

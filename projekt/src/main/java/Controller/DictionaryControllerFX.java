@@ -159,4 +159,18 @@ public class DictionaryControllerFX {
             model.getShuffledWords().add(word);
         }
     }
+
+    public boolean unlockMatching() {
+        if(model.getDictionary().size() > 4) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unlockLearning() {
+        if(model.getDictionary().size() > 0) {
+            return true;
+        }
+        return false;
+    }
 }

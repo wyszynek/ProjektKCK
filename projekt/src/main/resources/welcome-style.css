@@ -1,0 +1,52 @@
+/* Root background color */
+.root {
+    -fx-background-image: url("fish1.jpg");
+        -fx-background-size: cover; /* Ensures the image covers the entire background */
+        -fx-background-position: center center; /* Centers the image */
+        -fx-background-repeat: no-repeat; /* Prevents the image from repeating */
+        -fx-padding: 10; /* Add padding for spacing */
+}
+
+/* Welcome message styling */
+.welcome-message {
+    -fx-font-size: 29px;
+    -fx-font-weight: bold;
+    -fx-text-color: white; /* White text for contrast */
+    -fx-padding: 20;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 10, 0.0, 2, 2); /* Optional shadow to make text pop */
+    -fx-pref-width: 400; /* Fixed width to ensure readability */
+    -fx-pref-height: 100; /* Height adjustment */
+}
+
+.name-message {
+    -fx-font-size: 50px;
+    -fx-font-weight: bold;
+    -fx-text-color: white; /* White text for contrast */
+    -fx-padding: 20;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 10, 0.0, 2, 2); /* Optional shadow to make text pop */
+    -fx-pref-width: 400; /* Fixed width to ensure readability */
+    -fx-pref-height: 100; /* Height adjustment */
+}
+
+.button {
+    -fx-background-color: #4CAF50; /* Green background */
+    -fx-text-fill: white; /* White text */
+    -fx-font-size: 16px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.0, 2, 2);
+}
+
+/* Button hover effect */
+.button:hover {
+    -fx-background-color: #388e3c; /* Darker green when hovering */
+}
+
+/* StackPane setup */
+.stack-pane {
+    -fx-alignment: center; /* Center both button and text */
+    -fx-padding: 20px; /* Optional padding to prevent elements from touching the edges */
+}
