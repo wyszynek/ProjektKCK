@@ -153,12 +153,10 @@ public class DictionaryControllerFX {
         return model.getNextWord();
     }
 
-    // Pobiera opcje tłumaczenia (tłumaczenie poprawne + losowe opcje)
     public List<String> getMatchingOptions(String word, int numberOfOptions) {
         return model.getMatchingOptions(word, numberOfOptions);
     }
-
-    // Sprawdza, czy odpowiedź użytkownika jest poprawna
+    
     public boolean isCorrectTranslationMatching(String word, String userTranslation) {
         return model.isCorrectTranslationMatching(word, userTranslation);
     }

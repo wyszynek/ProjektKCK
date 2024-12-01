@@ -8,6 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.net.URL;
+
 public class LoadDictionaryView {
     private Stage stage;
     private DictionaryControllerFX controller;
@@ -37,9 +40,15 @@ public class LoadDictionaryView {
         loadButton.setOnAction(e -> {
             String fileName = fileNameField.getText().trim();
             if (!fileName.isEmpty()) {
-                controller.loadDictionaryFromFile(fileName);
-                instructionLabel.setText("Pomyślnie wczytano słówka z " + fileName);
-                fileNameField.clear();
+                File file = new File(fileName);
+
+                if (file.exists() && file.isFile()) {
+                    controller.loadDictionaryFromFile(fileName);
+                    instructionLabel.setText("Pomyślnie wczytano słówka z " + fileName);
+                    fileNameField.clear();
+                } else {
+                    instructionLabel.setText("Nieprawidłowa nazwa pliku lub plik nie istnieje!");
+                }
             } else {
                 instructionLabel.setText("Nazwa pliku nie może być pusta!");
             }
@@ -47,7 +56,7 @@ public class LoadDictionaryView {
 
         backButton.setOnAction(e -> {
             controller.showMainMenu();
-            clearFields(); // Czyści pola tekstowe i resetuje komunikaty
+            clearFields();
         });
 
         // Ustawienie sceny i tytułu
@@ -58,6 +67,14 @@ public class LoadDictionaryView {
         layout.getChildren().addAll(instructionLabel, fileNameField, loadButton, backButton);
 
         Scene scene = new Scene(layout, 500, 400);
+
+        URL resource = getClass().getResource("/styles.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
         stage.setScene(scene);
         stage.setTitle("Wczytaj słownik");
     }

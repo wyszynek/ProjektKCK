@@ -54,7 +54,7 @@ public class LearnMatchingView {
 
         Scene scene = new Scene(layout, 500, 400);
 
-        URL resource = getClass().getResource("/matching-style.css");
+        URL resource = getClass().getResource("/styles.css");
         if (resource != null) {
             scene.getStylesheets().add(resource.toExternalForm());
         } else {

@@ -72,7 +72,7 @@ public class AddWordView {
         // Scena jest ustawiana tylko raz
         Scene scene = new Scene(layout, 500, 400);
 
-        URL resource = getClass().getResource("/addword-style.css");
+        URL resource = getClass().getResource("/styles.css");
         if (resource != null) {
             scene.getStylesheets().add(resource.toExternalForm());
         } else {

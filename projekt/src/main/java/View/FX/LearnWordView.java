@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.Map;
 
 public class LearnWordView {
@@ -27,14 +28,14 @@ public class LearnWordView {
         this.stage = stage;
         this.controller = controller;
 
-        wordLabel = new Label();           // Wyświetlane słowo
+        wordLabel = new Label();
         translationField = new TextField();
         translationField.setPromptText("Wpisz tłumaczenie...");
-        feedbackLabel = new Label();       // Informacja zwrotna dla użytkownika
+        feedbackLabel = new Label();
         checkButton = new Button("Sprawdź");
         skipButton = new Button("Pomiń");
         nextButton = new Button("Przejdź do następnego");
-        nextButton.setVisible(false);      // Ukryty na początku
+        nextButton.setVisible(false);
     }
 
     public void show() {
@@ -51,6 +52,14 @@ public class LearnWordView {
         layout.getChildren().addAll(wordLabel, translationField, feedbackLabel, checkButton, skipButton, nextButton, backButton);
 
         Scene scene = new Scene(layout, 500, 400);
+
+        URL resource = getClass().getResource("/styles.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
         stage.setScene(scene);
         stage.setTitle("Tryb Nauki");
 

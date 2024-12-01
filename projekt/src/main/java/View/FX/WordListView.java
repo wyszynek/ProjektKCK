@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -63,13 +64,23 @@ public class WordListView {
             String selectedWord = wordList.getSelectionModel().getSelectedItem();
             String wordToDelete = selectedWord.split(" - ")[0]; // Wyciągamy słowo przed myślnikiem
 
-            // Usuwamy słowo z słownika
-            controller.removeWord(wordToDelete);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Potwierdzenie");
+            alert.setHeaderText("Na pewno chcesz usunąć to słowo?");
+            alert.setContentText("Słowo: " + wordToDelete);
 
-            // Usuwamy je z ObservableList, co spowoduje automatyczne odświeżenie widoku listy
-            words.remove(selectedWord);
+            // Czekaj na odpowiedź użytkownika
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    // Usuwamy słowo z słownika
+                    controller.removeWord(wordToDelete);
 
-            deleteButton.setDisable(true); // Zablokuj przycisk po usunięciu słowa
+                    // Usuwamy je z ObservableList, co spowoduje automatyczne odświeżenie widoku listy
+                    words.remove(selectedWord);
+
+                    deleteButton.setDisable(true); // Zablokuj przycisk po usunięciu słowa
+                }
+            });
         });
 
         Button backButton = new Button("Powrót");
@@ -78,6 +89,14 @@ public class WordListView {
         layout.getChildren().addAll(searchField, wordList, deleteButton, backButton);
 
         Scene scene = new Scene(layout, 500, 400);
+
+        URL resource = getClass().getResource("/styles.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
         stage.setScene(scene);
         stage.setTitle("Lista słówek");
     }
