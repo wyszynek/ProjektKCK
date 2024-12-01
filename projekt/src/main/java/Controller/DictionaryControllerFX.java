@@ -156,7 +156,7 @@ public class DictionaryControllerFX {
     public List<String> getMatchingOptions(String word, int numberOfOptions) {
         return model.getMatchingOptions(word, numberOfOptions);
     }
-    
+
     public boolean isCorrectTranslationMatching(String word, String userTranslation) {
         return model.isCorrectTranslationMatching(word, userTranslation);
     }
