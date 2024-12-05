@@ -1,10 +1,12 @@
 package View.FX;
 
 import Controller.DictionaryControllerFX;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,6 +23,7 @@ public class LearnWordView {
     private Button checkButton;
     private Button skipButton;
     private Button nextButton;
+    private Button correctButton;
 
     private String currentWord;
 
@@ -35,6 +38,7 @@ public class LearnWordView {
         checkButton = new Button("Sprawdź");
         skipButton = new Button("Pomiń");
         nextButton = new Button("Przejdź do następnego");
+        correctButton = new Button("Odznacz jako poprawne");
         nextButton.setVisible(false);
     }
 
@@ -42,14 +46,19 @@ public class LearnWordView {
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20;");
 
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(correctButton, nextButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
         Button backButton = new Button("Powrót");
 
         checkButton.setOnAction(e -> checkTranslation());
         skipButton.setOnAction(e -> skipWord());
         backButton.setOnAction(e -> controller.showMainMenu());
         nextButton.setOnAction(e -> loadNextWord());
+        correctButton.setOnAction(e -> markAsCorrect());
 
-        layout.getChildren().addAll(wordLabel, translationField, feedbackLabel, checkButton, skipButton, nextButton, backButton);
+        layout.getChildren().addAll(wordLabel, translationField, feedbackLabel, checkButton, skipButton, buttonBox, backButton);
 
         Scene scene = new Scene(layout, 500, 400);
 
@@ -68,6 +77,7 @@ public class LearnWordView {
 
     private void loadNextWord() {
         nextButton.setVisible(false);    // Ukrywamy przycisk "Przejdź do następnego"
+        correctButton.setVisible(false);
         skipButton.setDisable(false);   // Odblokowujemy przycisk "Pomiń"
         checkButton.setDisable(false);  // Odblokowujemy przycisk "Sprawdź"
         currentWord = controller.continueLearning();
@@ -85,15 +95,21 @@ public class LearnWordView {
         if (controller.checkAnswer(currentWord, userTranslation)) {
             feedbackLabel.setText("Poprawnie!");
         } else {
-            feedbackLabel.setText("Błędna odpowiedź.");
+            feedbackLabel.setText("Błędna odpowiedź. Poprawna odpowiedź to: " + controller.getCorrectTranslation(currentWord));
         }
-        nextButton.setVisible(true);    // Pokazujemy przycisk "Przejdź do następnego"
-        skipButton.setDisable(true);   // Blokujemy przycisk "Pomiń"
-        checkButton.setDisable(true);  // Blokujemy przycisk "Sprawdź"
+        nextButton.setVisible(true);
+        skipButton.setDisable(true);
+        checkButton.setDisable(true);
+        correctButton.setVisible(true);
     }
 
     private void skipWord() {
         controller.skipWord(currentWord);
+        loadNextWord(); // Ładujemy kolejne słowo
+    }
+
+    private void markAsCorrect() {
+        controller.markAsCorrect();
         loadNextWord(); // Ładujemy kolejne słowo
     }
 

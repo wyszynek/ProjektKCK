@@ -1,4 +1,5 @@
 import Controller.DictionaryControllerFX;
+import Controller.LearningControllerFX;
 import Model.DictionaryModel;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
@@ -23,7 +24,7 @@ public class MainJavaFX extends Application {
                 stage.close();
             }
         });
-        
+
         DictionaryModel model = new DictionaryModel();
         DictionaryControllerFX controller = new DictionaryControllerFX(stage, model);
         controller.showWelcomeWindow();

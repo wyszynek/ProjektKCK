@@ -182,4 +182,12 @@ public class DictionaryControllerFX {
         }
         return false;
     }
+
+    public String getCorrectTranslation(String word) {
+        return model.searchWord(word);
+    }
+
+    public void markAsCorrect() {
+        model.markAnswerAsCorrect();
+    }
 }
