@@ -13,3 +13,4 @@
   - **Tryb Dopasowania**: Dopasowanie słówka do jego tłumaczenia.
 - **Zapisz/Wczytaj Słownik**: Zapis słownika do pliku i wczytanie go.
 - **Interaktywny Interfejs**: Zbudowany z wykorzystaniem biblioteki Lanterna w wersji 2.1.7, aby zapewnić prosty i responsywny interfejs terminalowy.
+- **Interfejs GUI**: Zbudowany z wykorzystaniem JavaFX w wersji OpenJFX 23, aby zapewnić wygodne i płynne korzystanie z aplikacji.
