@@ -48,21 +48,18 @@ public class WordListView {
             ));
         });
 
-        // Przycisk "Usuń" (początkowo nieaktywny)
         Button deleteButton = new Button("Usuń");
-        deleteButton.setDisable(true); // Początkowo przycisk jest zablokowany
+        deleteButton.setDisable(true);
 
-        // Aktywacja przycisku "Usuń" po zaznaczeniu słowa
         wordList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                deleteButton.setDisable(false); // Aktywuj przycisk, gdy wybrane jest słowo
+                deleteButton.setDisable(false);
             }
         });
 
-        // Akcja usuwania słowa po kliknięciu "Usuń"
         deleteButton.setOnAction(e -> {
             String selectedWord = wordList.getSelectionModel().getSelectedItem();
-            String wordToDelete = selectedWord.split(" - ")[0]; // Wyciągamy słowo przed myślnikiem
+            String wordToDelete = selectedWord.split(" - ")[0];
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Potwierdzenie");

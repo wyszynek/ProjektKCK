@@ -1,13 +1,22 @@
 package View.FX;
 
 import Controller.DictionaryControllerFX;
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 import javax.tools.Tool;
 import java.net.URL;
@@ -38,8 +47,20 @@ public class MainMenuView {
         wordListButton.setOnAction(e -> controller.showWordListView());
         saveDictionaryButton.setOnAction(e -> controller.showSaveDictionaryView());
         loadDictionaryButton.setOnAction(e -> controller.loadSaveDictionaryView());
-        learnButton.setOnAction(e -> controller.startLearning());
-        matchingButton.setOnAction(e -> controller.startMatching());
+        learnButton.setOnAction(e -> {
+            if (controller.unlockLearning() == false) {
+                showLearningConfirmation();
+            } else {
+                controller.startLearning();
+            }
+        });
+        matchingButton.setOnAction(e -> {
+            if (controller.unlockMatching() == false) {
+                showMatchingConfirmation();
+            } else {
+                controller.startMatching();
+            }
+        });
         exitButton.setOnAction(e -> {
             Alert exitConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
             exitConfirmation.setTitle("Potwierdzenie Wyjścia");
@@ -52,18 +73,6 @@ public class MainMenuView {
                 stage.close();
             }
         });
-
-        if (!controller.unlockMatching()) {
-            matchingButton.setDisable(true);
-            Tooltip matchingTooltip = new Tooltip("Opcja Dopasowania jest niedostępna. Upewnij się, że masz wymagane dane.");
-            Tooltip.install(matchingButton, matchingTooltip);
-        }
-
-        if (!controller.unlockLearning()) {
-            learnButton.setDisable(true);
-            Tooltip learningTooltip = new Tooltip("Opcja Test jest niedostępna. Dodaj więcej słów, aby odblokować.");
-            Tooltip.install(learnButton, learningTooltip);
-        }
 
         layout.getChildren().addAll(addWordButton, wordListButton, saveDictionaryButton, loadDictionaryButton, learnButton, matchingButton, exitButton);
 
@@ -78,6 +87,24 @@ public class MainMenuView {
 
         stage.setScene(scene);
         stage.setTitle("Menu główne");
+    }
+
+    public void showMatchingConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Brak wystarczającej liczby słówek");
+        alert.setHeaderText("Nie możesz rozpocząć nauki");
+        alert.setContentText("Aby aktywować tryb nauki, słownik musi zawierać przynajmniej 5 słówek.");
+
+        alert.showAndWait();
+    }
+
+    public void showLearningConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Brak wystarczającej liczby słówek");
+        alert.setHeaderText("Nie możesz rozpocząć nauki");
+        alert.setContentText("Aby aktywować tryb nauki, musisz dodać więcej słówek do słownika.");
+
+        alert.showAndWait();
     }
 }
 

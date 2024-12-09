@@ -53,10 +53,19 @@ public class LearnWordView {
         Button backButton = new Button("Powrót");
 
         checkButton.setOnAction(e -> checkTranslation());
-        skipButton.setOnAction(e -> skipWord());
+
+        skipButton.setOnAction(e -> {
+            controller.skipWord(currentWord);
+            loadNextWord();
+        });
         backButton.setOnAction(e -> controller.showMainMenu());
+
         nextButton.setOnAction(e -> loadNextWord());
-        correctButton.setOnAction(e -> markAsCorrect());
+
+        correctButton.setOnAction(e -> {
+            controller.markAsCorrect();
+            loadNextWord();
+        });
 
         layout.getChildren().addAll(wordLabel, translationField, feedbackLabel, checkButton, skipButton, buttonBox, backButton);
 
@@ -72,45 +81,58 @@ public class LearnWordView {
         stage.setScene(scene);
         stage.setTitle("Tryb Nauki");
 
-        loadNextWord(); // Ładujemy pierwsze słowo
+        loadNextWord();
     }
 
     private void loadNextWord() {
-        nextButton.setVisible(false);    // Ukrywamy przycisk "Przejdź do następnego"
+        nextButton.setVisible(false);
         correctButton.setVisible(false);
-        skipButton.setDisable(false);   // Odblokowujemy przycisk "Pomiń"
-        checkButton.setDisable(false);  // Odblokowujemy przycisk "Sprawdź"
+        skipButton.setDisable(false);
+        checkButton.setDisable(false);
         currentWord = controller.continueLearning();
         if (currentWord != null) {
             wordLabel.setText("Przetłumacz słówko:    " + currentWord);
             translationField.clear();
             feedbackLabel.setText("");
         } else {
-            showStatistics(); // Koniec nauki - pokaż statystyki
+            showStatistics();
         }
     }
 
     private void checkTranslation() {
         String userTranslation = translationField.getText();
-        if (controller.checkAnswer(currentWord, userTranslation)) {
-            feedbackLabel.setText("Poprawnie!");
-        } else {
-            feedbackLabel.setText("Błędna odpowiedź. Poprawna odpowiedź to: " + controller.getCorrectTranslation(currentWord));
+        String feedback = controller.checkAnswerLearning(currentWord, userTranslation);
+        feedbackLabel.setText(feedback);
+
+        if(feedback == "Proszę wypełnić puste pole.") {
+            return;
         }
+        else if(feedback == "Poprawnie.") {
+            correctButton.setVisible(false);
+        }
+        else {
+            correctButton.setVisible(true);
+        }
+
         nextButton.setVisible(true);
         skipButton.setDisable(true);
         checkButton.setDisable(true);
-        correctButton.setVisible(true);
-    }
 
-    private void skipWord() {
-        controller.skipWord(currentWord);
-        loadNextWord(); // Ładujemy kolejne słowo
-    }
-
-    private void markAsCorrect() {
-        controller.markAsCorrect();
-        loadNextWord(); // Ładujemy kolejne słowo
+//        if (userTranslation.isBlank()) {
+//            feedbackLabel.setText("Proszę wpisać odpowiedź.");
+//            return;
+//        }
+//
+//        boolean isCorrect = controller.checkAnswer(currentWord, userTranslation);
+//
+//        if (isCorrect) {
+//            feedbackLabel.setText("Poprawnie!");
+//            correctButton.setVisible(false);
+//        } else {
+//            feedbackLabel.setText("Błędna odpowiedź. Poprawna odpowiedź to: " + controller.getCorrectTranslation(currentWord));
+//            correctButton.setVisible(true);
+//        }
+//
     }
 
     private void showStatistics() {

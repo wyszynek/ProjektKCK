@@ -28,9 +28,8 @@ public class AddWordView {
         layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
-        feedbackLabel = new Label();  // Informacja zwrotna dla użytkownika
+        feedbackLabel = new Label();
 
-        // Tworzymy elementy UI tylko raz
         wordField = new TextField();
         wordField.setPromptText("Słówko");
 
@@ -42,34 +41,31 @@ public class AddWordView {
     }
 
     public void show() {
-        feedbackLabel.setVisible(false);    // Ukrywamy przycisk "Przejdź do następnego"
+        feedbackLabel.setVisible(false);
+
         saveButton.setOnAction(e -> {
-            if(!wordField.getText().isEmpty() && !translationField.getText().isEmpty()) {
-                if(controller.checkIfExists(wordField.getText(), translationField.getText())) {
-                    feedbackLabel.setVisible(true);
-                    feedbackLabel.setText("Pomyślnie dodano słówko.");
-                    controller.addWord(wordField.getText(), translationField.getText());
-                    clearFields();  // Czyścimy tylko pola tekstowe
-                }
-                else {
-                    feedbackLabel.setVisible(true);
-                    feedbackLabel.setText("Podane słowa już istnieją.");
-                }
-            }
-            else {
-                feedbackLabel.setVisible(true);
-                feedbackLabel.setText("Proszę wypełnić puste pola.");
+            String word = wordField.getText();
+            String translation = translationField.getText();
+
+            // Delegowanie logiki do kontrolera
+            String feedback = controller.handleAddWord(word, translation);
+
+            // Inteligentne odświeżanie
+            feedbackLabel.setText(feedback);
+            feedbackLabel.setVisible(true);
+
+            if ("Pomyślnie dodano słówko.".equals(feedback)) {
+                clearFields();
             }
         });
 
         backButton.setOnAction(e -> {
             controller.showMainMenu();
-            clearFields();  // Czyścimy tylko pola tekstowe
+            clearFields();
         });
 
         layout.getChildren().addAll(feedbackLabel, wordField, translationField, saveButton, backButton);
 
-        // Scena jest ustawiana tylko raz
         Scene scene = new Scene(layout, 500, 400);
 
         URL resource = getClass().getResource("/styles.css");
@@ -83,9 +79,8 @@ public class AddWordView {
         stage.setTitle("Dodaj słówko");
     }
 
-    // Dodatkowa metoda do czyszczenia tylko zmienionych elementów
     private void clearFields() {
-        wordField.clear();      // Czyszczenie pola tekstowego dla słówka
-        translationField.clear();  // Czyszczenie pola tekstowego dla tłumaczenia
+        wordField.clear();
+        translationField.clear();
     }
 }

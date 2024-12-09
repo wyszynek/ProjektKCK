@@ -46,8 +46,14 @@ public class LearnMatchingView {
         Button backButton = new Button("Powrót");
 
         checkButton.setOnAction(e -> checkTranslation());
-        skipButton.setOnAction(e -> skipWord());
+
+        skipButton.setOnAction(e -> {
+            controller.skipWord(currentWord);
+            loadNextWord();
+        });
+
         backButton.setOnAction(e -> controller.showMainMenu());
+
         nextButton.setOnAction(e -> loadNextWord());
 
         layout.getChildren().addAll(wordLabel, optionsLayout, feedbackLabel, checkButton, skipButton, nextButton, backButton);
@@ -64,14 +70,17 @@ public class LearnMatchingView {
         stage.setScene(scene);
         stage.setTitle("Tryb Nauki przez Dopasowanie");
 
-        loadNextWord(); // Ładujemy pierwsze słowo
+        loadNextWord();
     }
 
     private void loadNextWord() {
-        nextButton.setVisible(false);    // Ukrywamy przycisk "Przejdź do następnego"
-        skipButton.setDisable(false);   // Odblokowujemy przycisk "Pomiń"
-        checkButton.setDisable(false);  // Odblokowujemy przycisk "Sprawdź"
+        nextButton.setVisible(false);
+        skipButton.setDisable(false);
+        checkButton.setDisable(false);
+        optionsGroup.selectToggle(null);
+
         currentWord = controller.continueMatching();
+
         if (currentWord != null) {
             wordLabel.setText("Przetłumacz słówko:    " + currentWord);
             optionsLayout.getChildren().clear(); // Czyszczenie poprzednich opcji
@@ -82,7 +91,7 @@ public class LearnMatchingView {
             for (String option : options) {
                 RadioButton radioButton = new RadioButton(option);
                 radioButton.setToggleGroup(optionsGroup);
-                radioButton.setStyle("-fx-text-fill: white;"); // Ustawienie koloru tekstu na biały
+                radioButton.setStyle("-fx-text-fill: white;");
                 optionsLayout.getChildren().add(radioButton);
             }
         } else {
@@ -92,42 +101,54 @@ public class LearnMatchingView {
 
     private void checkTranslation() {
         String userTranslation = getSelectedOption();
+        String feedback = controller.checkTranslationMatching(currentWord, userTranslation);
+        feedbackLabel.setText(feedback);
 
-        if (userTranslation != null) {
-            // Sprawdzamy, czy odpowiedź jest poprawna
-            if (controller.isCorrectTranslationMatching(currentWord, userTranslation)) {
-                feedbackLabel.setText("Poprawnie!");
-            } else {
-                feedbackLabel.setText("Błędna odpowiedź.");
-            }
-
-            // Blokowanie wszystkich opcji (Checkboxów)
-            for (javafx.scene.Node node : optionsLayout.getChildren()) {
-                if (node instanceof CheckBox) {
-                    CheckBox checkBox = (CheckBox) node;
-                    checkBox.setDisable(true);  // Zablokuj wszystkie checkboxy
-                }
-            }
-
-            checkButton.setDisable(true);
-            skipButton.setDisable(true);
-            nextButton.setVisible(true);
-        } else {
-            feedbackLabel.setText("Proszę wybrać odpowiedź.");
+        if (feedback.equals("Proszę wybrać odpowiedź.")) {
+            return; // Zatrzymaj metodę
         }
+
+        for (javafx.scene.Node node : optionsLayout.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                checkBox.setDisable(true);
+            }
+        }
+
+        checkButton.setDisable(true);
+        skipButton.setDisable(true);
+        nextButton.setVisible(true);
+
+//        if (userTranslation != null) {
+//            // Sprawdzamy, czy odpowiedź jest poprawna
+//            if (controller.isCorrectTranslationMatching(currentWord, userTranslation)) {
+//                feedbackLabel.setText("Poprawnie!");
+//            } else {
+//                feedbackLabel.setText("Błędna odpowiedź. Poprawna odpowiedź:   " + controller.getCorrectTranslation(currentWord));
+//            }
+//
+//            // Blokowanie wszystkich opcji (Checkboxów)
+//            for (javafx.scene.Node node : optionsLayout.getChildren()) {
+//                if (node instanceof CheckBox) {
+//                    CheckBox checkBox = (CheckBox) node;
+//                    checkBox.setDisable(true);  // Zablokuj wszystkie checkboxy
+//                }
+//            }
+//
+//            checkButton.setDisable(true);
+//            skipButton.setDisable(true);
+//            nextButton.setVisible(true);
+//        } else {
+//            feedbackLabel.setText("Proszę wybrać odpowiedź.");
+//        }
     }
 
     private String getSelectedOption() {
         RadioButton selectedRadioButton = (RadioButton) optionsGroup.getSelectedToggle();
         if (selectedRadioButton != null) {
-            return selectedRadioButton.getText();  // Zwróć zaznaczoną odpowiedź
+            return selectedRadioButton.getText();
         }
-        return null; // Jeśli nie wybrano żadnej opcji
-    }
-
-    private void skipWord() {
-        controller.skipWord2(currentWord);
-        loadNextWord();
+        return null;
     }
 
     private void showStatistics() {

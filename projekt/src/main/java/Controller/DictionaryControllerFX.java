@@ -48,35 +48,147 @@ public class DictionaryControllerFX {
         view.show();
     }
 
-    public void startLearning() {
-        model.resetProgress(); // Resetujemy stan nauki
-        showLearningView();    // Przechodzimy do widoku nauki
-    }
-
     private void showLearningView() {
         LearnWordView view = new LearnWordView(stage, this);
         view.show();
     }
 
-    // Logika obsługi dodawania słówka
-    public void addWord(String word, String translation) {
-        if (word.isBlank() || translation.isBlank()) {
-            System.out.println("Słówko i tłumaczenie nie mogą być puste."); // Można dodać informację w GUI
-            return;
-        }
-        model.addWord(word, translation);
+    private void showMatchingView() {
+        LearnMatchingView view = new LearnMatchingView(stage, this);
+        view.show();
     }
 
-    public boolean checkIfExists(String word, String translation) {
-        if (model.getDictionary().containsKey(word) || (model.getDictionary().containsKey(translation) &&
-                model.getDictionary().get(translation).equals(word))) {
-            return false;
-        } else if (!word.isEmpty() && !translation.isEmpty()) {
+    public boolean unlockMatching() {
+        if(model.getDictionary().size() > 4) {
             return true;
         }
-
         return false;
     }
+
+    public boolean unlockLearning() {
+        if(model.getDictionary().size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    public String handleAddWord(String word, String translation) {
+        if (word.isBlank() || translation.isBlank()) {
+            return "Proszę wypełnić puste pola.";
+        }
+        if (model.getDictionary().containsKey(word) ||
+                (model.getDictionary().containsKey(translation) && model.getDictionary().get(translation).equals(word))) {
+            return "Podane słowa już istnieją.";
+        }
+        model.addWord(word, translation);
+        return "Pomyślnie dodano słówko.";
+    }
+
+    public void removeWord(String selectedWord) {
+        model.removeWord(selectedWord);
+    }
+
+    public void skipWord(String word) {
+        String translation = model.searchWord(word);
+        if((!model.getSkippedWordsMap().containsKey(word) || !model.getSkippedWordsMap().containsKey(translation))) {
+            model.increaseSkippedAnswers();
+            model.getSkippedWordsMap().put(word, translation);
+            model.getSkippedWordsMap().put(translation, word);
+            model.getSkippedWords().add(word);
+            model.getShuffledWords().add(word);
+        }
+    }
+
+    public String getCorrectTranslation(String word) {
+        return model.searchWord(word);
+    }
+
+
+
+    public void startMatching() {
+        model.resetProgress();
+        showMatchingView();
+    }
+
+    public String continueMatching() {
+        return model.getNextWord();
+    }
+
+    public List<String> getMatchingOptions(String word, int numberOfOptions) {
+        return model.getMatchingOptions(word, numberOfOptions);
+    }
+
+    public String checkTranslationMatching(String word, String userTranslation) {
+        boolean temp = model.isCorrectTranslationMatching(word, userTranslation);
+        if (userTranslation == null) {
+            return "Proszę wybrać odpowiedź.";
+        }
+        if (temp) {
+            return "Poprawnie.";
+        }
+        return "Błędna odpowiedź. Poprawna odpowiedź:   " + getCorrectTranslation(word);
+    }
+
+//    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
+//        return model.isCorrectTranslationMatching(word, userTranslation);
+//    }
+
+
+
+    public void startLearning() {
+        model.resetProgress(); // Resetujemy stan nauki
+        showLearningView();    // Przechodzimy do widoku nauki
+    }
+
+    public String continueLearning() {
+        String word = model.getNextWordLearning();
+        if (word != null) {
+            if (model.shouldTranslateToEnglish()) {
+                return word;
+            } else {
+                String translation = model.searchWord(word);
+                return translation;
+            }
+        } else {
+            getLearningStatistics();
+        }
+        return null;
+    }
+
+    public void markAsCorrect() {
+        model.markAnswerAsCorrect();
+    }
+
+    public Map<String, Integer> getLearningStatistics() {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("Correct", model.getCorrectAnswers());
+        stats.put("Incorrect", model.getIncorrectAnswers());
+        stats.put("Skipped", model.getSkippedAnswers());
+        stats.put("Total", model.getDictionary().size());
+        return stats;
+    }
+
+    public String checkAnswerLearning(String word, String userTranslation) {
+        if (userTranslation.isEmpty()) {
+            return "Proszę wypełnić puste pole.";
+        }
+
+        boolean temp = model.isCorrectTranslation(word, userTranslation);
+
+        if(!temp) {
+            return "Błędna odpowiedź. Poprawna odpowiedź to:   " + getCorrectTranslation(word);
+        }
+
+        return "Poprawnie.";
+    }
+
+//    public boolean checkAnswer(String word, String translation) {
+//        return model.isCorrectTranslation(word, translation);
+//    }
+
+
 
     public void saveDictionaryToFile(String fileName) {
         try {
@@ -94,100 +206,5 @@ public class DictionaryControllerFX {
         } catch (IOException e) {
             System.out.println("Błąd wczytywania słownika: " + e.getMessage());
         }
-    }
-
-    public String continueLearning() {
-        String word = model.getNextWordLearning();
-        if (word != null) {
-            if (model.shouldTranslateToEnglish()) {
-                return word;
-            } else {
-                String translation = model.searchWord(word); // Znajduje polski odpowiednik
-                return translation;
-            }
-        } else {
-            getLearningStatistics();
-        }
-        return null;
-    }
-
-    public void skipWord(String word) {
-        String translation = model.searchWord(word);
-        if((!model.getSkippedWordsMap().containsKey(word) || !model.getSkippedWordsMap().containsKey(translation))) {
-            model.increaseSkippedAnswers();
-            model.getSkippedWordsMap().put(word, translation);
-            model.getSkippedWordsMap().put(translation, word);
-            model.getSkippedWords().add(word);
-            model.getShuffledWords().add(word);
-        }
-    }
-
-    public boolean checkAnswer(String word, String translation) {
-        return model.isCorrectTranslation(word, translation);
-    }
-
-    public Map<String, Integer> getLearningStatistics() {
-        Map<String, Integer> stats = new HashMap<>();
-        stats.put("Correct", model.getCorrectAnswers());
-        stats.put("Incorrect", model.getIncorrectAnswers());
-        stats.put("Skipped", model.getSkippedAnswers());
-        stats.put("Total", model.getDictionary().size());
-        return stats;
-    }
-
-    public void removeWord(String selectedWord) {
-        model.removeWord(selectedWord);
-    }
-
-    public void startMatching() {
-        model.resetProgress();
-        showMatchingView();
-    }
-
-    private void showMatchingView() {
-        LearnMatchingView view = new LearnMatchingView(stage, this);
-        view.show();
-    }
-
-    public String continueMatching() {
-        return model.getNextWord();
-    }
-
-    public List<String> getMatchingOptions(String word, int numberOfOptions) {
-        return model.getMatchingOptions(word, numberOfOptions);
-    }
-
-    public boolean isCorrectTranslationMatching(String word, String userTranslation) {
-        return model.isCorrectTranslationMatching(word, userTranslation);
-    }
-
-    public void skipWord2(String word) {
-        if (!model.getSkippedWords().contains(word)) {
-            model.increaseSkippedAnswers();
-            model.getSkippedWords().add(word);
-            model.getShuffledWords().add(word);
-        }
-    }
-
-    public boolean unlockMatching() {
-        if(model.getDictionary().size() > 4) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean unlockLearning() {
-        if(model.getDictionary().size() > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public String getCorrectTranslation(String word) {
-        return model.searchWord(word);
-    }
-
-    public void markAsCorrect() {
-        model.markAnswerAsCorrect();
     }
 }
