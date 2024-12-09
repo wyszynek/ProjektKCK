@@ -1,8 +1,10 @@
 import Model.DictionaryModel;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DictionaryModelTest {
     private DictionaryModel dictionaryModel;
@@ -11,26 +13,64 @@ public class DictionaryModelTest {
     public void setUp() {
         dictionaryModel = new DictionaryModel();
         dictionaryModel.addWord("pies", "dog");
-    }
-
-    @Test
-    public void testAddWord() {
-        // Dodajemy słowo do słownika
         dictionaryModel.addWord("kot", "cat");
-
-        // Sprawdzamy, czy słowo zostało dodane poprawnie
-        assertEquals("cat", dictionaryModel.getDictionary().get("kot"));
     }
 
     @Test
-    public void testRemoveWord() {
-        // Usuwamy słowo "pies" ze słownika
-        boolean removed = dictionaryModel.removeWord("pies");
+    public void testSearchWord() {
+        // Szukanie tłumaczenia
+        assertEquals("dog", dictionaryModel.searchWord("pies"));
+        assertEquals("pies", dictionaryModel.searchWord("dog"));
 
-        // Sprawdzamy, czy metoda zwróciła true (usunięcie się powiodło)
-        assertTrue(removed);
+        // Szukanie nieistniejącego słowa
+        assertNull(dictionaryModel.searchWord("ryba"));
+    }
 
-        // Sprawdzamy, czy słowo zostało faktycznie usunięte ze słownika
-        assertNull(dictionaryModel.getDictionary().get("pies"));
+    @Test
+    public void testIsCorrectTranslation() {
+        assertTrue(dictionaryModel.isCorrectTranslation("pies", "dog"));
+
+        assertFalse(dictionaryModel.isCorrectTranslation("pies", "cat"));
+    }
+
+    @Test
+    public void testMarkAnswerAsCorrect() {
+        int initialCorrect = dictionaryModel.getCorrectAnswers();
+        dictionaryModel.markAnswerAsCorrect();
+        assertEquals(initialCorrect + 1, dictionaryModel.getCorrectAnswers());
+    }
+
+    @Test
+    public void testSkipWord() {
+        dictionaryModel.shuffleWords();
+        dictionaryModel.increaseSkippedAnswers();
+
+        // Sprawdzamy, czy liczba pominięć się zwiększyła
+        assertEquals(1, dictionaryModel.getSkippedAnswers());
+    }
+
+    @Test
+    public void testSaveAndLoadDictionary() throws Exception {
+        String testFile = "testDictionary.txt";
+
+        dictionaryModel.saveDictionary(testFile);
+
+        DictionaryModel loadedModel = new DictionaryModel();
+        loadedModel.loadDictionary(testFile);
+
+        assertEquals(dictionaryModel.getDictionary().size(), loadedModel.getDictionary().size());
+        assertEquals("dog", loadedModel.searchWord("pies"));
+    }
+
+    @Test
+    public void testMatchingOptions() {
+        dictionaryModel.addWord("ryba", "fish");
+        dictionaryModel.addWord("dom", "house");
+
+        List<String> options = dictionaryModel.getMatchingOptions("pies", 3);
+
+        assertTrue(options.contains("dog"));
+
+        assertEquals(3, options.size());
     }
 }

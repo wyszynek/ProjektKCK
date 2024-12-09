@@ -73,7 +73,7 @@ public class LearnMatchingView {
         checkButton.setDisable(false);  // Odblokowujemy przycisk "Sprawdź"
         currentWord = controller.continueMatching();
         if (currentWord != null) {
-            wordLabel.setText("Przetłumacz słówko: " + currentWord);
+            wordLabel.setText("Przetłumacz słówko:    " + currentWord);
             optionsLayout.getChildren().clear(); // Czyszczenie poprzednich opcji
             feedbackLabel.setText("");
 
@@ -81,7 +81,8 @@ public class LearnMatchingView {
             List<String> options = controller.getMatchingOptions(currentWord, 4); // 4 opcje
             for (String option : options) {
                 RadioButton radioButton = new RadioButton(option);
-                radioButton.setToggleGroup(optionsGroup);  // Przypisanie do grupy
+                radioButton.setToggleGroup(optionsGroup);
+                radioButton.setStyle("-fx-text-fill: white;"); // Ustawienie koloru tekstu na biały
                 optionsLayout.getChildren().add(radioButton);
             }
         } else {

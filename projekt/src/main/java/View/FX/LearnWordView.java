@@ -82,7 +82,7 @@ public class LearnWordView {
         checkButton.setDisable(false);  // Odblokowujemy przycisk "Sprawdź"
         currentWord = controller.continueLearning();
         if (currentWord != null) {
-            wordLabel.setText("Przetłumacz słówko: " + currentWord);
+            wordLabel.setText("Przetłumacz słówko:    " + currentWord);
             translationField.clear();
             feedbackLabel.setText("");
         } else {

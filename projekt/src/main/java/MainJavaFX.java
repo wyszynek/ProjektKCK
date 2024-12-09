@@ -1,5 +1,4 @@
 import Controller.DictionaryControllerFX;
-import Controller.LearningControllerFX;
 import Model.DictionaryModel;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
